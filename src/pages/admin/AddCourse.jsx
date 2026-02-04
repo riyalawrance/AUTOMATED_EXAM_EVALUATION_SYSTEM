@@ -1,0 +1,90 @@
+import React, { useState } from "react";
+import { Link } from "react-router-dom"; // Navigation
+import "./AddCourse.css";
+
+const AddCourse = () => {
+  const [courseId, setCourseId] = useState("");
+  const [courseName, setCourseName] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const handleAddCourse = () => {
+    if (courseId && courseName) {
+      setSuccess(true);
+      setCourseId("");
+      setCourseName("");
+    }
+  };
+
+  return (
+    <div className="admin-container">
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <h2 className="admin-logo">AEES</h2>
+
+        <div className="user-info">
+          <div className="avatar">A</div>
+          <div className="user-details">
+            <h4>Dr. John Mathew</h4>
+            <p>System Administrator</p>
+          </div>
+        </div>
+
+        <div className="sidebar-cards">
+          <Link to="/admin/AdminDashboard" className="sidebar-card">
+            Dashboard
+          </Link>
+          <Link to="/admin/TeacherManagement" className="sidebar-card">
+            Teacher Management
+          </Link>
+          <Link to="/admin/StudentManagement" className="sidebar-card">
+            Student Management
+          </Link>
+          <Link to="/admin/AddClass" className="sidebar-card">
+            Add Class
+          </Link>
+          <Link to="/admin/CourseMapping" className="sidebar-card">
+            Course Mapping
+          </Link>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="admin-main">
+        <div className="logout-container">
+          <button className="logout-btn-top">Logout</button>
+        </div>
+
+        <h1 className="page-title">Add Course</h1>
+        <div className="form-wrapper">
+          <div className="form-card">
+            <h3>Course Details</h3>
+
+            <input
+              type="text"
+              placeholder="Course ID"
+              value={courseId}
+              onChange={(e) => setCourseId(e.target.value)}
+            />
+
+            <input
+              type="text"
+              placeholder="Course Name"
+              value={courseName}
+              onChange={(e) => setCourseName(e.target.value)}
+            />
+
+            <button className="primary-btn" onClick={handleAddCourse}>
+              Add Course
+            </button>
+
+            {success && (
+              <p className="success-text">✅ Course added successfully</p>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default AddCourse;

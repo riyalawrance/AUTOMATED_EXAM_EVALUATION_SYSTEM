@@ -1,0 +1,264 @@
+/* ================= RESET ================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* ================= LAYOUT ================= */
+.admin-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f5f7fb;
+}
+
+/* ================= SIDEBAR ================= */
+.admin-sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #283a8c, #4a5fd1);
+  color: white;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-logo {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* Admin Profile */
+.admin-profile {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.admin-profile h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.admin-profile p {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* Sidebar Cards */
+.sidebar-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-card {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.sidebar-card:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ================= MAIN CONTENT ================= */
+.admin-main {
+  flex: 1;
+  padding: 40px;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* Logout (Top Right) */
+.logout-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.logout-btn-top {
+  background: linear-gradient(135deg, #283a8c, #4a5fd1);
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  font-size: 14px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.logout-btn-top:hover {
+  opacity: 0.9;
+}
+
+/* ================= PAGE TITLE ================= */
+.page-title {
+  color: #283a8c;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+/* ================= ACTION BUTTONS ================= */
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.action-buttons button {
+  background: linear-gradient(135deg, #283a8c, #4a5fd1);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.action-buttons button:hover {
+  opacity: 0.9;
+}
+
+/* ================= FORM CARD ================= */
+.form-card {
+  background: white;
+  padding: 30px;
+  border-radius: 14px;
+  max-width: 450px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.form-card h3 {
+  color: #283a8c;
+  margin-bottom: 15px;
+}
+
+
+.form-card input,
+.form-card select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Buttons */
+.primary-btn {
+  background: linear-gradient(135deg, #283a8c, #4a5fd1);
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ================= DELETE DANGER ================= */
+.danger {
+  border-left: 5px solid #d9534f;
+}
+
+.warning-text {
+  color: #b02a37;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.danger-btn {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.action-card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
+}
+
+.action-card h3 {
+  color: #283a8c;
+  margin-bottom: 8px;
+}
+
+.action-card p {
+  font-size: 14px;
+  color: #555;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(40, 58, 140, 0.25);
+}
+.danger-card h3 {
+  color: #283a8c;
+}
+
+.danger-card:hover {
+  box-shadow: 0 15px 30px rgba(217, 83, 79, 0.35);
+}
+
+.action-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== USER INFO (Sidebar) ===== */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: white;
+  color: #283a8c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.user-details h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.user-details p {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.85;
+}

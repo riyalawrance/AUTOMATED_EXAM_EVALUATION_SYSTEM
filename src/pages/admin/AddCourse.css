@@ -1,0 +1,162 @@
+/* Layout */
+.admin-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f7fb;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #283a8c, #4a5fd1);
+  color: white;
+  padding: 30px 20px;
+}
+
+.admin-logo {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* User Info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: white;
+  color: #283a8c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.user-details h4 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.user-details p {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* Sidebar cards */
+.sidebar-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-card {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Main */
+.admin-main {
+  flex: 1;
+  padding: 40px;
+}
+
+/* Logout */
+.logout-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.logout-btn-top {
+  background: linear-gradient(135deg, #283a8c, #4a5fd1);
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+/* Title */
+.page-title {
+  font-size: 28px;
+  color: #283a8c;
+  margin-bottom: 30px;
+}
+
+/* Form Card */
+.form-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  max-width: 550px;   /* increased width */
+  width: 100%;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.form-card h3 {
+  margin-bottom: 25px;
+  color: #283a8c;
+  font-size: 22px;
+}
+
+.form-card input {
+  width: 100%;
+  padding: 14px;        /* increased height */
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+
+/* Buttons */
+.primary-btn {
+  background: linear-gradient(135deg, #283a8c, #4a5fd1);
+  color: white;
+  border: none;
+  padding: 14px;        /* taller button */
+  width: 100%;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+
+/* Success Message */
+.success-text {
+  margin-top: 20px;
+  color: #2e7d32;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.form-wrapper {
+  display: flex;
+  justify-content: center;   /* centers horizontally */
+  margin-top: 80px;          /* spacing from top */
+}
+
+.sidebar-card {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+}
