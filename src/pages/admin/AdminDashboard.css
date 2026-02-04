@@ -115,17 +115,20 @@ body {
   text-align: center;
   font-size: 16px;
   font-weight: 500;
-  color: #283a8c;
+  color: #283a8c;        /* Keep your text color */
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   font-family: "Segoe UI", sans-serif;
+  text-decoration: none;  /* No underline */
+  color: inherit;         /* Inherit card text color */
 }
 
 .admin-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 30px rgba(40, 58, 140, 0.25);
 }
+
 
 /* User Info Block */
 .user-info {

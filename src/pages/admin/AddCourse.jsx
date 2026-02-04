@@ -19,30 +19,31 @@ const AddCourse = () => {
     <div className="admin-container">
       {/* Sidebar */}
       <aside className="admin-sidebar">
-        <h2 className="admin-logo">AEES</h2>
+        <h2 className="admin-logo">SAGE</h2>
 
         <div className="user-info">
           <div className="avatar">A</div>
           <div className="user-details">
-            <h4>Dr. John Mathew</h4>
+            <h4>Admin1</h4>
             <p>System Administrator</p>
           </div>
         </div>
 
+        {/* Sidebar Links */}
         <div className="sidebar-cards">
-          <Link to="/admin/AdminDashboard" className="sidebar-card">
+          <Link to="/" className="sidebar-card">
             Dashboard
           </Link>
-          <Link to="/admin/TeacherManagement" className="sidebar-card">
+          <Link to="/admin/teachers" className="sidebar-card">
             Teacher Management
           </Link>
-          <Link to="/admin/StudentManagement" className="sidebar-card">
+          <Link to="/admin/students" className="sidebar-card">
             Student Management
           </Link>
-          <Link to="/admin/AddClass" className="sidebar-card">
+          <Link to="/admin/add-class" className="sidebar-card">
             Add Class
           </Link>
-          <Link to="/admin/CourseMapping" className="sidebar-card">
+          <Link to="/admin/course-mapping" className="sidebar-card">
             Course Mapping
           </Link>
         </div>

@@ -1,10 +1,10 @@
-// rollno class name mail admnno pass
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // <-- Import Link
 import "./StudentManagement.css";
 
 const StudentManagement = () => {
   const admin = {
-    name: "Dr. John Mathew",
+    name: "Admin1",
     role: "System Administrator",
   };
 
@@ -15,7 +15,7 @@ const StudentManagement = () => {
     <div className="admin-container">
       {/* Sidebar */}
       <aside className="admin-sidebar">
-        <h2 className="admin-logo">AEES</h2>
+        <h2 className="admin-logo">SAGE</h2>
 
         {/* User Info */}
         <div className="user-info">
@@ -26,11 +26,23 @@ const StudentManagement = () => {
           </div>
         </div>
 
+        {/* Sidebar links */}
         <div className="sidebar-cards">
-          <div className="sidebar-card">Teacher Management</div>
-          <div className="sidebar-card">Add Course</div>
-          <div className="sidebar-card">Add Class</div>
-          <div className="sidebar-card">Course Mapping</div>
+          <Link to="/" className="sidebar-card">
+            Dashboard
+          </Link>
+          <Link to="/admin/teachers" className="sidebar-card">
+            Teacher Management
+          </Link>
+          <Link to="/admin/add-course" className="sidebar-card">
+            Add Course
+          </Link>
+          <Link to="/admin/add-class" className="sidebar-card">
+            Add Class
+          </Link>
+          <Link to="/admin/course-mapping" className="sidebar-card">
+            Course Mapping
+          </Link>
         </div>
       </aside>
 
@@ -103,9 +115,7 @@ const StudentManagement = () => {
           {/* DELETE STUDENT */}
           <div className="action-card-wrapper">
             <div
-              className={`action-card danger-card ${
-                activeAction === "delete" ? "active" : ""
-              }`}
+              className={`action-card danger-card ${activeAction === "delete" ? "active" : ""}`}
               onClick={() => setActiveAction("delete")}
             >
               <h3>Delete Student</h3>

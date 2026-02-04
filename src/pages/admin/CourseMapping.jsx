@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./AddCourse.css"; // Reusing the same CSS
+import { Link } from "react-router-dom"; // Navigation
+import "./AddCourse.css"; // Reusing same CSS
 
 const CourseMapping = () => {
   // Placeholder data simulating database values
@@ -15,7 +16,6 @@ const CourseMapping = () => {
   const handleMapCourse = () => {
     if (selectedClass && selectedCourse && selectedTeacher) {
       setSuccess(true);
-      // Reset selections
       setSelectedClass("");
       setSelectedCourse("");
       setSelectedTeacher("");
@@ -26,21 +26,33 @@ const CourseMapping = () => {
     <div className="admin-container">
       {/* Sidebar */}
       <aside className="admin-sidebar">
-        <h2 className="admin-logo">AEES</h2>
+        <h2 className="admin-logo">SAGE</h2>
 
         <div className="user-info">
           <div className="avatar">A</div>
           <div className="user-details">
-            <h4>Dr. John Mathew</h4>
+            <h4>Admin1</h4>
             <p>System Administrator</p>
           </div>
         </div>
 
+        {/* Sidebar Links */}
         <div className="sidebar-cards">
-          <div className="sidebar-card">Teacher Management</div>
-          <div className="sidebar-card">Student Management</div>
-          <div className="sidebar-card">Add Course</div>
-          <div className="sidebar-card">Add Class</div>
+          <Link to="/" className="sidebar-card">
+            Dashboard
+          </Link>
+          <Link to="/admin/teachers" className="sidebar-card">
+            Teacher Management
+          </Link>
+          <Link to="/admin/students" className="sidebar-card">
+            Student Management
+          </Link>
+          <Link to="/admin/add-course" className="sidebar-card">
+            Add Course
+          </Link>
+          <Link to="/admin/add-class" className="sidebar-card">
+            Add Class
+          </Link>
         </div>
       </aside>
 
@@ -60,7 +72,14 @@ const CourseMapping = () => {
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              style={{ width: "100%", padding: "14px", marginBottom: "20px", borderRadius: "8px", fontSize: "15px", border: "1px solid #ccc" }}
+              style={{
+                width: "100%",
+                padding: "14px",
+                marginBottom: "20px",
+                borderRadius: "8px",
+                fontSize: "15px",
+                border: "1px solid #ccc",
+              }}
             >
               <option value="">Select Class</option>
               {classes.map((cls, idx) => (
@@ -74,7 +93,14 @@ const CourseMapping = () => {
             <select
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
-              style={{ width: "100%", padding: "14px", marginBottom: "20px", borderRadius: "8px", fontSize: "15px", border: "1px solid #ccc" }}
+              style={{
+                width: "100%",
+                padding: "14px",
+                marginBottom: "20px",
+                borderRadius: "8px",
+                fontSize: "15px",
+                border: "1px solid #ccc",
+              }}
             >
               <option value="">Select Course</option>
               {courses.map((course, idx) => (
@@ -88,7 +114,14 @@ const CourseMapping = () => {
             <select
               value={selectedTeacher}
               onChange={(e) => setSelectedTeacher(e.target.value)}
-              style={{ width: "100%", padding: "14px", marginBottom: "20px", borderRadius: "8px", fontSize: "15px", border: "1px solid #ccc" }}
+              style={{
+                width: "100%",
+                padding: "14px",
+                marginBottom: "20px",
+                borderRadius: "8px",
+                fontSize: "15px",
+                border: "1px solid #ccc",
+              }}
             >
               <option value="">Select Teacher</option>
               {teachers.map((teacher, idx) => (

@@ -1,8 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-// Import all your pages
-import Login from "./pages/auth/Login";
+// Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import TeacherManagement from "./pages/admin/TeacherManagement";
 import StudentManagement from "./pages/admin/StudentManagement";
@@ -14,11 +13,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Default Login */}
-        <Route path="/" element={<Login />} />
+        {/* Start directly at AdminDashboard */}
+        <Route path="/" element={<AdminDashboard />} />
 
-        {/* Admin Pages */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        {/* Pages navigated from dashboard cards */}
         <Route path="/admin/teachers" element={<TeacherManagement />} />
         <Route path="/admin/students" element={<StudentManagement />} />
         <Route path="/admin/add-course" element={<AddCourse />} />
@@ -26,7 +24,7 @@ function App() {
         <Route path="/admin/course-mapping" element={<CourseMapping />} />
 
         {/* Redirect unknown paths to dashboard */}
-        <Route path="*" element={<Navigate to="/admin/dashboard" />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );

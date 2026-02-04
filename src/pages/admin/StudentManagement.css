@@ -75,18 +75,22 @@ body {
   gap: 12px;
 }
 
+/* Sidebar links */
 .sidebar-card {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 12px;
+  display: block;
+  text-decoration: none; /* remove underline */
+  color: inherit;        /* keep text color */
+  padding: 15px 20px;
+  margin-bottom: 10px;
   border-radius: 8px;
-  text-align: center;
+  transition: background 0.2s;
   cursor: pointer;
-  font-size: 14px;
 }
 
 .sidebar-card:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background-color: #e5e7eb; /* subtle hover effect */
 }
+
 
 /* ================= MAIN ================= */
 .admin-main {

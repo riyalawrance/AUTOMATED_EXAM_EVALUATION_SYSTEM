@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // <-- Import Link
 import "./TeacherManagement.css";
 
 const TeacherManagement = () => {
   const admin = {
-    name: "Dr. John Mathew",
+    name: "Admin1",
     role: "System Administrator",
   };
 
@@ -14,20 +15,33 @@ const TeacherManagement = () => {
     <div className="admin-container">
       {/* Sidebar */}
       <aside className="admin-sidebar">
-        <h2 className="admin-logo">AEES</h2>
+        <h2 className="admin-logo">SAGE</h2>
 
         <div className="user-info">
-            <div className="avatar">A</div>
-            <div className="user-details">
-                <h4>{admin.name}</h4>
-                <p>{admin.role}</p>
-            </div>
+          <div className="avatar">A</div>
+          <div className="user-details">
+            <h4>{admin.name}</h4>
+            <p>{admin.role}</p>
+          </div>
         </div>
+
+        {/* Sidebar links */}
         <div className="sidebar-cards">
-          <div className="sidebar-card">Student Management</div>
-          <div className="sidebar-card">Add Course</div>
-          <div className="sidebar-card">Add Class</div>
-          <div className="sidebar-card">Course Mapping</div>
+          <Link to="/" className="sidebar-card">
+            Dashboard
+          </Link>
+          <Link to="/admin/students" className="sidebar-card">
+            Student Management
+          </Link>
+          <Link to="/admin/add-course" className="sidebar-card">
+            Add Course
+          </Link>
+          <Link to="/admin/add-class" className="sidebar-card">
+            Add Class
+          </Link>
+          <Link to="/admin/course-mapping" className="sidebar-card">
+            Course Mapping
+          </Link>
         </div>
       </aside>
 
@@ -41,87 +55,85 @@ const TeacherManagement = () => {
         <h1 className="page-title">Teacher Management</h1>
 
         <div className="action-cards">
+          {/* ADD TEACHER CARD */}
+          <div className="action-card-wrapper">
+            <div
+              className={`action-card ${activeAction === "add" ? "active" : ""}`}
+              onClick={() => setActiveAction("add")}
+            >
+              <h3>Add Teacher</h3>
+            </div>
 
-  {/* ADD TEACHER CARD */}
-  <div className="action-card-wrapper">
-    <div
-      className={`action-card ${activeAction === "add" ? "active" : ""}`}
-      onClick={() => setActiveAction("add")}
-    >
-      <h3>Add Teacher</h3>
-    </div>
+            {activeAction === "add" && (
+              <div className="form-card">
+                <h3>Add Teacher</h3>
+                <input placeholder="ID" />
+                <input placeholder="Name" />
+                <input placeholder="Email ID" />
+                <input placeholder="Phone Number" />
+                <button className="primary-btn">Add Teacher</button>
+              </div>
+            )}
+          </div>
 
-    {activeAction === "add" && (
-      <div className="form-card">
-        <h3>Add Teacher</h3>
-        <input placeholder="ID" />
-        <input placeholder="Name" />
-        <input placeholder="Email ID" />
-        <input placeholder="Phone Number" />
-        <button className="primary-btn">Add Teacher</button>
-      </div>
-    )}
-  </div>
+          {/* UPDATE TEACHER CARD */}
+          <div className="action-card-wrapper">
+            <div
+              className={`action-card ${activeAction === "update" ? "active" : ""}`}
+              onClick={() => setActiveAction("update")}
+            >
+              <h3>Update Teacher</h3>
+            </div>
 
-  {/* UPDATE TEACHER CARD */}
-  <div className="action-card-wrapper">
-    <div
-      className={`action-card ${activeAction === "update" ? "active" : ""}`}
-      onClick={() => setActiveAction("update")}
-    >
-      <h3>Update Teacher</h3>
-    </div>
+            {activeAction === "update" && (
+              <div className="form-card">
+                <h3>Update Teacher</h3>
 
-    {activeAction === "update" && (
-      <div className="form-card">
-        <h3>Update Teacher</h3>
+                <input placeholder="Enter Teacher ID" />
 
-        <input placeholder="Enter Teacher ID" />
+                <select
+                  value={selectedField}
+                  onChange={(e) => setSelectedField(e.target.value)}
+                >
+                  <option value="">Select Field to Update</option>
+                  <option value="name">Name</option>
+                  <option value="email">Email</option>
+                  <option value="phone">Phone Number</option>
+                </select>
 
-        <select
-          value={selectedField}
-          onChange={(e) => setSelectedField(e.target.value)}
-        >
-          <option value="">Select Field to Update</option>
-          <option value="name">Name</option>
-          <option value="email">Email</option>
-          <option value="phone">Phone Number</option>
-        </select>
+                {selectedField && (
+                  <input placeholder={`Enter new ${selectedField}`} />
+                )}
 
-        {selectedField && (
-          <input placeholder={`Enter new ${selectedField}`} />
-        )}
+                <button className="primary-btn">Update</button>
+              </div>
+            )}
+          </div>
 
-        <button className="primary-btn">Update</button>
-      </div>
-    )}
-  </div>
+          {/* DELETE TEACHER CARD */}
+          <div className="action-card-wrapper">
+            <div
+              className={`action-card danger-card ${activeAction === "delete" ? "active" : ""}`}
+              onClick={() => setActiveAction("delete")}
+            >
+              <h3>Delete Teacher</h3>
+            </div>
 
-  {/* DELETE TEACHER CARD */}
-  <div className="action-card-wrapper">
-    <div
-      className={`action-card danger-card ${activeAction === "delete" ? "active" : ""}`}
-      onClick={() => setActiveAction("delete")}
-    >
-      <h3>Delete Teacher</h3>
-    </div>
+            {activeAction === "delete" && (
+              <div className="form-card danger">
+                <h3>Delete Teacher</h3>
 
-    {activeAction === "delete" && (
-      <div className="form-card danger">
-        <h3>Delete Teacher</h3>
+                <input placeholder="Enter Teacher ID" />
 
-        <input placeholder="Enter Teacher ID" />
+                <p className="warning-text">
+                  Are you sure you want to delete this teacher? This action cannot be undone.
+                </p>
 
-        <p className="warning-text">
-          Are you sure you want to delete this teacher? This action cannot be undone.
-        </p>
-
-        <button className="danger-btn">Confirm Delete</button>
-      </div>
-    )}
-  </div>
-
-    </div>
+                <button className="danger-btn">Confirm Delete</button>
+              </div>
+            )}
+          </div>
+        </div>
       </main>
     </div>
   );
