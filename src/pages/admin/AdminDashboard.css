@@ -5,7 +5,7 @@ body {
 }
 
 /* Layout */
-.admin-container {
+.container {
   display: flex;
   height: 100vh;
   width: 100%;
@@ -13,7 +13,7 @@ body {
 }
 
 /* Sidebar */
-.admin-sidebar {
+.sidebar {
   width: 260px;
   background: linear-gradient(180deg, #283a8c, #4a5fd1);
   color: white;
@@ -25,110 +25,14 @@ body {
 }
 
 /* Logo */
-.admin-logo {
+.logo {
   font-size: 30px;
   font-weight: 700;
   letter-spacing: 3px;
   margin-bottom: 40px;
-  font-family: "Segoe UI", sans-serif;
-}
-
-/* Admin Profile */
-.admin-profile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
-  margin-bottom: 35px;
   font-family: "Segoe UI", sans-serif;
 }
-
-.admin-profile h3 {
-  font-size: 16px;
-  margin-bottom: 4px;
-}
-
-.admin-profile p {
-  font-size: 13px;
-  opacity: 0.85;
-}
-
-/* Main Content */
-.admin-main {
-  flex: 1;
-  padding: 40px;
-  overflow-y: auto;
-  font-family: "Segoe UI", sans-serif; /* Main content font updated */
-}
-
-/* Logout Button Container */
-.logout-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 30px;
-}
-
-/* Logout Button (Top Right) */
-.logout-btn-top {
-  background: linear-gradient(135deg, #283a8c, #4a5fd1);
-  border: none;
-  color: white;
-  padding: 8px 18px;
-  font-size: 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  font-family: "Segoe UI", sans-serif;
-}
-
-.logout-btn-top:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(40, 58, 140, 0.35);
-}
-
-/* Header */
-.admin-header h1 {
-  color: #283a8c;
-  margin-bottom: 6px;
-  font-family: "Segoe UI", sans-serif;
-}
-
-.admin-header p {
-  color: #666;
-  margin-bottom: 35px;
-  font-family: "Segoe UI", sans-serif;
-}
-
-/* Cards Grid */
-.admin-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 25px;
-  font-family: "Segoe UI", sans-serif;
-}
-
-/* Dashboard Cards */
-.admin-card {
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 14px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #283a8c;        /* Keep your text color */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  font-family: "Segoe UI", sans-serif;
-  text-decoration: none;  /* No underline */
-  color: inherit;         /* Inherit card text color */
-}
-
-.admin-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(40, 58, 140, 0.25);
-}
-
 
 /* User Info Block */
 .user-info {
@@ -138,6 +42,7 @@ body {
   background: rgba(255, 255, 255, 0.15);
   padding: 14px;
   border-radius: 12px;
+  margin-bottom: 30px;
   width: 100%;
   font-family: "Segoe UI", sans-serif;
 }
@@ -171,14 +76,189 @@ body {
   font-family: "Segoe UI", sans-serif;
 }
 
-.admin-card h3 {
+
+/* Main Content */
+.main {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  font-family: "Segoe UI", sans-serif; /* Main content font updated */
+}
+
+/* Logout Button Container */
+.logout-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 30px;
+}
+
+/* Logout Button (Top Right) */
+.logout-btn-top {
+  background: linear-gradient(135deg, #283a8c, #4a5fd1);
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  font-size: 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.logout-btn-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(40, 58, 140, 0.35);
+}
+
+/* Sidebar cards */
+.sidebar-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Sidebar links */
+.sidebar-card {
+  display: block;
+  text-decoration: none; /* remove underline */
+  color: inherit;        /* keep text color */
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15);
+  text-align: center;
+  font-size: 14px;
+}
+
+.sidebar-card:hover {
+  background-color: #e5e7eb; /* subtle hover effect */
+}
+
+/* Title */
+.page-title {
+  font-size: 28px;
+  color: #283a8c;
+  margin-bottom: 30px;
+}
+
+
+/* Cards Grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Dashboard Cards */
+.dash-card {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 14px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: #283a8c;        /* Keep your text color */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: "Segoe UI", sans-serif;
+  text-decoration: none;  /* No underline */
+  color: inherit;         /* Inherit card text color */
+}
+
+.dash-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(40, 58, 140, 0.25);
+}
+
+.dash-card h3 {
   font-weight: 700;       /* make heading bold */
   font-size: 16px;        /* match teacher card heading */
   color: #283a8c;
   margin-bottom: 8px;
 }
 
-.admin-card p {
-  font-size: 14px;        /* same as teacher page */
-  color: #555;
+.dash-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.danger {
+  border-left: 5px solid #d9534f;
+}
+
+.warning-text {
+  color: #b02a37;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.danger-btn {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.danger-card:hover {
+  box-shadow: 0 15px 30px rgba(217, 83, 79, 0.35);
+}
+
+/* Form Card */
+.form-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  max-width: 550px;   /* increased width */
+  width: 100%;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.form-card h3 {
+  margin-bottom: 25px;
+  color: #283a8c;
+  font-size: 22px;
+}
+
+.form-card input,
+.form-card select {
+  width: 100%;
+  padding: 10px;        /* increased height */
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+/* Buttons */
+.primary-btn {
+  background: linear-gradient(135deg, #283a8c, #4a5fd1);
+  color: white;
+  border: none;
+  padding: 12px;        /* taller button */
+  width: 100%;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* Success Message */
+.success-text {
+  margin-top: 20px;
+  color: #2e7d32;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.form-wrapper {
+  display: flex;
+  justify-content: center;   /* centers horizontally */
+  margin-top: 80px;          /* spacing from top */
 }
