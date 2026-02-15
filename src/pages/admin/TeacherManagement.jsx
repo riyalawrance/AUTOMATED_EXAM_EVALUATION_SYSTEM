@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom"; // <-- Import Link
-import "./TeacherManagement.css";
+import "./AdminDashboard.css"; // <-- Reuse AdminDashboard styles
 
 const TeacherManagement = () => {
   const admin = {
@@ -12,10 +12,10 @@ const TeacherManagement = () => {
   const [selectedField, setSelectedField] = useState("");
 
   return (
-    <div className="admin-container">
+    <div className="container">
       {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <h2 className="admin-logo">SAGE</h2>
+      <aside className="sidebar">
+        <h2 className="logo">SAGE</h2>
 
         <div className="user-info">
           <div className="avatar">A</div>
@@ -46,7 +46,7 @@ const TeacherManagement = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="admin-main">
+      <main className="main">
         {/* Logout */}
         <div className="logout-container">
           <button className="logout-btn-top">Logout</button>
@@ -54,11 +54,11 @@ const TeacherManagement = () => {
 
         <h1 className="page-title">Teacher Management</h1>
 
-        <div className="action-cards">
+        <div className="card-grid">
           {/* ADD TEACHER CARD */}
-          <div className="action-card-wrapper">
+          <div className="dash-card-wrapper">
             <div
-              className={`action-card ${activeAction === "add" ? "active" : ""}`}
+              className={`dash-card ${activeAction === "add" ? "active" : ""}`}
               onClick={() => setActiveAction("add")}
             >
               <h3>Add Teacher</h3>
@@ -77,9 +77,9 @@ const TeacherManagement = () => {
           </div>
 
           {/* UPDATE TEACHER CARD */}
-          <div className="action-card-wrapper">
+          <div className="dash-card-wrapper">
             <div
-              className={`action-card ${activeAction === "update" ? "active" : ""}`}
+              className={`dash-card ${activeAction === "update" ? "active" : ""}`}
               onClick={() => setActiveAction("update")}
             >
               <h3>Update Teacher</h3>
@@ -111,9 +111,9 @@ const TeacherManagement = () => {
           </div>
 
           {/* DELETE TEACHER CARD */}
-          <div className="action-card-wrapper">
+          <div className="dash-card-wrapper">
             <div
-              className={`action-card danger-card ${activeAction === "delete" ? "active" : ""}`}
+              className={`dash-card danger-card ${activeAction === "delete" ? "active" : ""}`}
               onClick={() => setActiveAction("delete")}
             >
               <h3>Delete Teacher</h3>

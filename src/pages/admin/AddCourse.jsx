@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom"; // Navigation
-import "./AddCourse.css";
+import "./AdminDashboard.css"; // Using same CSS as AdminDashboard for consistency
 
 const AddCourse = () => {
   const [courseId, setCourseId] = useState("");
@@ -16,10 +16,10 @@ const AddCourse = () => {
   };
 
   return (
-    <div className="admin-container">
+    <div className="container">
       {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <h2 className="admin-logo">SAGE</h2>
+      <aside className="sidebar">
+        <h2 className="logo">SAGE</h2>
 
         <div className="user-info">
           <div className="avatar">A</div>
@@ -50,7 +50,7 @@ const AddCourse = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="admin-main">
+      <main className="main">
         <div className="logout-container">
           <button className="logout-btn-top">Logout</button>
         </div>

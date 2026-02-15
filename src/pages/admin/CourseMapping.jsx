@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom"; // Navigation
-import "./AddCourse.css"; // Reusing same CSS
+import "./AdminDashboard.css"; // Reusing same CSS
 
 const CourseMapping = () => {
   // Placeholder data simulating database values
@@ -23,10 +23,10 @@ const CourseMapping = () => {
   };
 
   return (
-    <div className="admin-container">
+    <div className="container">
       {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <h2 className="admin-logo">SAGE</h2>
+      <aside className="sidebar">
+        <h2 className="logo">SAGE</h2>
 
         <div className="user-info">
           <div className="avatar">A</div>
@@ -57,7 +57,7 @@ const CourseMapping = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="admin-main">
+      <main className="main">
         <div className="logout-container">
           <button className="logout-btn-top">Logout</button>
         </div>
