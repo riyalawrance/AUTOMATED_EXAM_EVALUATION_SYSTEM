@@ -112,14 +112,14 @@ const Revaluation = () => {
                   <div>
                     <p style={{
                       fontFamily: "var(--font-display)",
-                      fontSize: "16px",
+                      fontSize: "18px",
                       fontWeight: 700,
                       color: "var(--text-1)",
                       marginBottom: "2px",
                     }}>
                       {student}
                     </p>
-                    <p style={{ fontSize: "12px", color: "var(--text-3)", letterSpacing: "0.5px" }}>
+                    <p style={{ fontSize: "14px", color: "var(--text-3)", letterSpacing: "0.5px" }}>
                       Roll No: {rollNo}
                     </p>
                   </div>
@@ -131,7 +131,7 @@ const Revaluation = () => {
                       border: "1px solid var(--border-bright)",
                       borderRadius: "var(--r-full)",
                       padding: "4px 12px",
-                      fontSize: "12px",
+                      fontSize: "14px",
                       fontWeight: 600,
                     }}>
                       {cls} · {exam}

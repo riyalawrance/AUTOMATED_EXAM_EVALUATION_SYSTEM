@@ -91,10 +91,6 @@ const UpdateMark = () => {
               </li>
             ))}
           </ul>
-          <div className="sidebar-footer">
-            <button className="com-btn logout-btn-top" style={{ width: "100%" }}
-              onClick={() => navigate("/login")}>↩ Sign Out</button>
-          </div>
         </aside>
         <main className="main">
           <div className="com-card" style={{ textAlign: "center", padding: "60px 24px", marginTop: "60px" }}>
@@ -140,15 +136,6 @@ const UpdateMark = () => {
           ))}
         </ul>
 
-        <div className="sidebar-footer">
-          <button
-            className="com-btn logout-btn-top"
-            style={{ width: "100%" }}
-            onClick={() => navigate("/login")}
-          >
-            ↩ Sign Out
-          </button>
-        </div>
       </aside>
 
       {/* ── Main ── */}
@@ -175,12 +162,12 @@ const UpdateMark = () => {
             ].map(({ label, value }) => (
               <div key={label}>
                 <p style={{
-                  fontSize: "11px", fontWeight: 600, letterSpacing: "1.2px",
+                  fontSize: "12px", fontWeight: 600, letterSpacing: "1.2px",
                   textTransform: "uppercase", color: "var(--text-3)", marginBottom: "4px",
                 }}>
                   {label}
                 </p>
-                <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-1)" }}>
+                <p style={{ fontSize: "16px", fontWeight: 600, color: "var(--text-1)" }}>
                   {value}
                 </p>
               </div>
@@ -191,7 +178,7 @@ const UpdateMark = () => {
         {/* ── Marks Edit Card ── */}
         <div className="com-card">
           <p style={{
-            fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 700,
+            fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: 700,
             color: "var(--text-1)", marginBottom: "20px",
           }}>
             Edit Question Marks
