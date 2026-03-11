@@ -50,7 +50,7 @@ const ManageClass = () => {
 
   const fetchClasses = async () => {
     try {
-      const res = await fetch(${API_BASE}/api/classes);
+      const res = await fetch(`${API_BASE}/api/classes`);
       const data = await res.json();
 
       if (!res.ok) throw new Error(data?.message || "Failed to fetch classes");
@@ -75,7 +75,7 @@ const ManageClass = () => {
     const classId = buildClassId(admYear, passOutYear, division);
 
     try {
-      const res = await fetch(${API_BASE}/api/classes, {
+      const res = await fetch(`${API_BASE}/api/classes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
