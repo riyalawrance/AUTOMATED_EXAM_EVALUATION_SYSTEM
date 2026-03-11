@@ -132,7 +132,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL;
             className="com-btn logout-btn-top"
             onClick={() => navigate("/login")}
           >
-            ↩ Logout
+            ↩ Back
           </button>
         </div>
 
