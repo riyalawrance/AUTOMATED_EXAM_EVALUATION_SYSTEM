@@ -215,7 +215,7 @@ router.post("/revaluation", async (req, res) => {
 
   try {
 
-    const { studentName, rollNo, classId, course, examType } = req.body;
+    const { studentName, rollNo, classId, course, examType, studentReason } = req.body;
 
     // Check if already requested
     const existing = await Revaluation.findOne({
@@ -248,6 +248,7 @@ router.post("/revaluation", async (req, res) => {
       classId,
       course,
       examType,
+      studentReason, 
       teacherId: mapping?.teacherId || null
     });
 
