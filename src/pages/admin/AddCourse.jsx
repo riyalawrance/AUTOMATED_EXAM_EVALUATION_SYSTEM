@@ -31,7 +31,7 @@ const ManageCourse = () => {
       .some((v) => v.toLowerCase().includes(search.toLowerCase()))
   );
   useEffect(() => {
-  fetch("http://localhost:5000/api/courses")
+  fetch(`${API_BASE}/api/courses`)
     .then(res => res.json())
     .then(data => setCourses(data))
     .catch(err => console.error(err));
@@ -44,7 +44,7 @@ const ManageCourse = () => {
   }
 
   try {
-    const res = await fetch("${API_BASE}/api/courses", {
+    const res = await fetch(`${API_BASE}/api/courses`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
