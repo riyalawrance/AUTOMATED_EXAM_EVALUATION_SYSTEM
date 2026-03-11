@@ -10,8 +10,8 @@ const NAV_ITEMS = [
 const FEATURE_CARDS = [
   { label: "Teacher Management", icon: "🎓", sub: "Manage faculty records", path: "/admin/teachers" },
   { label: "Student Management", icon: "👥", sub: "Enrol & update students", path: "/admin/students" },
-  { label: "Add Course", icon: "📚", sub: "Create new courses", path: "/admin/add-course" },
-  { label: "Add Class", icon: "🏫", sub: "Define class sections", path: "/admin/add-class" },
+  { label: "Manage Course", icon: "📚", sub: "Create new courses", path: "/admin/add-course" },
+  { label: "Manage Class", icon: "🏫", sub: "Define class sections", path: "/admin/add-class" },
   { label: "Course Mapping", icon: "🔗", sub: "Assign courses to classes", path: "/admin/course-mapping" },
 ];
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
