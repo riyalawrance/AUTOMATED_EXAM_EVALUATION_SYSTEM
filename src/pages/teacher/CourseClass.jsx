@@ -47,7 +47,7 @@ const TeacherClasses = () => {
         }
 
         const res = await axios.get(
-          `http://localhost:5000/api/courseclass/teacher/${teacherId}/courses-classes`
+          `${API_BASE}/api/courseclass/teacher/${teacherId}/courses-classes`
         );
 
         const classesData = Array.isArray(res.data?.classes) ? res.data.classes : [];
@@ -87,7 +87,7 @@ const TeacherClasses = () => {
           return;
         }
 
-        const res = await axios.get("http://localhost:5000/api/courseclass/exams", {
+        const res = await axios.get("${API_BASE}/api/courseclass/exams", {
           params: {
             teacherId,
             classId: examClass !== "All" ? examClass : undefined,
@@ -146,7 +146,7 @@ const TeacherClasses = () => {
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/courseclass/class/${cls._id}/students`
+        `${API_BASE}/api/courseclass/class/${cls._id}/students`
       );
 
       console.log("RAW student response:", res.data);
