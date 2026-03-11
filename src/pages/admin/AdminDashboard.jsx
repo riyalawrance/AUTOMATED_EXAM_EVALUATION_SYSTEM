@@ -14,6 +14,7 @@ const FEATURE_CARDS = [
   { label: "Add Class", icon: "🏫", sub: "Define class sections", path: "/admin/add-class" },
   { label: "Course Mapping", icon: "🔗", sub: "Assign courses to classes", path: "/admin/course-mapping" },
 ];
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const AdminDashboard = () => {
 
