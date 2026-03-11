@@ -23,9 +23,6 @@ import courseclassRoutes from "./routes/courseclassRoutes.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-/* =========================
-   CORS
-========================= */
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
@@ -35,7 +32,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow Postman / server-to-server / same-origin requests with no origin
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -49,17 +45,9 @@ app.use(
   })
 );
 
-app.options("*", cors());
-
-/* =========================
-   BODY PARSERS
-========================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* =========================
-   HEALTH / ROOT
-========================= */
 app.get("/", (req, res) => {
   res.status(200).json({
     message: "Backend is live",
@@ -74,18 +62,14 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-/* =========================
-   DB + ROUTES + SERVER START
-========================= */
 const startServer = async () => {
   try {
     await connectDB();
     console.log("✅ Database connected");
 
-    // Routes
     app.use("/api/courses", courseRoutes);
     app.use("/api/students", studentRoutes);
-    app.use("/api/students", studentController); // keep only if both files are needed
+    app.use("/api/students", studentController);
     app.use("/api/upload", uploadRoutes);
     app.use("/api/uploadscript", uploadscriptRoutes);
     app.use("/api/exams", examRoutes);
@@ -99,21 +83,18 @@ const startServer = async () => {
     app.use("/api/reference", referenceAnswerRoutes);
     app.use("/api/courseclass", courseclassRoutes);
 
-    // 404 handler for unknown API routes
     app.use("/api", (req, res) => {
       return res.status(404).json({
         error: `API route not found: ${req.method} ${req.originalUrl}`,
       });
     });
 
-    // General 404
     app.use((req, res) => {
       return res.status(404).json({
         error: `Route not found: ${req.method} ${req.originalUrl}`,
       });
     });
 
-    // Global error handler
     app.use((err, req, res, next) => {
       console.error("❌ Server error:", err.stack || err.message || err);
 
