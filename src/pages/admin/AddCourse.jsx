@@ -19,6 +19,7 @@ const INITIAL_COURSES = [
   { courseId: "CS404", courseName: "Operating Systems"            },
   { courseId: "CS505", courseName: "Computer Networks"            },
 ];
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const ManageCourse = () => {
   const navigate = useNavigate();
