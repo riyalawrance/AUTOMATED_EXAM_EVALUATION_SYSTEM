@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { label: "Reference Answer", icon: "📖", path: "/reference-answer" },
   { label: "Revaluation", icon: "🔄", path: "/revaluation" },
 ];
-
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const ViewResult = () => {
   const navigate = useNavigate();
   const teacher = JSON.parse(localStorage.getItem("user"));
@@ -29,7 +29,7 @@ const ViewResult = () => {
   useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/markmatrix/filters", {
+        const res = await axios.get("${API_BASE}/api/markmatrix/filters", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -71,7 +71,7 @@ const ViewResult = () => {
     }
 
     try {
-      const res = await axios.get("http://localhost:5000/api/markmatrix/results", {
+      const res = await axios.get("${API_BASE}/api/markmatrix/results", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
