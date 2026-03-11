@@ -28,7 +28,7 @@ const ReferenceAnswer = () => {
   // Load Dropdown Data
   // ===============================
   useEffect(() => {
-    fetch("${API_BASE}/api/reference/dropdowns")
+    fetch(`${API_BASE}/api/reference/dropdowns`)
       .then(res => res.json())
       .then(data => {
         setClasses(data.classes);
@@ -48,7 +48,7 @@ const ReferenceAnswer = () => {
     }
 
     const res = await fetch(
-      "${API_BASE}/api/reference/view",
+      `${API_BASE}/api/reference/view`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
