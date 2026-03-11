@@ -19,7 +19,7 @@ const ORIGINAL_MARKS = {
 };
 
 const MAX_PER_Q = 10;
-
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const UpdateMark = () => {
   const teacher = JSON.parse(localStorage.getItem("user"));
   const navigate  = useNavigate();
