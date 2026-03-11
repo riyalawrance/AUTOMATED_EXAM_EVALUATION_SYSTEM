@@ -178,7 +178,7 @@ onClick={() => navigate("/login")}
 
 >
 
-↩ Logout </button>
+↩ Back </button>
 
 </div>
 
