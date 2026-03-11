@@ -134,7 +134,7 @@ const StudentManagement = () => {
     rollCollator.compare(String(a.rollNo || ""), String(b.rollNo || ""))
   );
 
-  const totalStudents = filteredSorted.length;
+  const totalStudents = students.length;
   const totalClasses = allClasses.length - 1;
 
   const handleAdd = async () => {
