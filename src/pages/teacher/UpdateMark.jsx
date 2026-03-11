@@ -11,13 +11,6 @@ const NAV_ITEMS = [
   {label:"My Classes",icon:"🏫",path:"/courseclass"},
 ];
 
-// Sample original marks — in a real app this comes from your backend
-// keyed by rollNo + course + exam
-const ORIGINAL_MARKS = {
-  "S2-101_Data Structures_Series Test 1": { q1: 8, q2: 7, q3: 9  },
-  "S3-204_DBMS_Series Test 2":            { q1: 6, q2: 5, q3: 7  },
-};
-
 const MAX_PER_Q = 10;
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const UpdateMark = () => {
