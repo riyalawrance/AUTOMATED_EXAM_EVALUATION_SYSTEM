@@ -27,7 +27,7 @@ const Revaluation = () => {
   useEffect(() => {
     if (!teacher?._id) return;
 
-    fetch(`${API_BASE}/api/teachers/revaluation-count/${teacher._id}`)
+    fetch(`${API_BASE}/api/teachers/ation-count/${teacher._id}`)
       .then((res) => res.json())
       .then((data) => setPendingCount(data.count))
       .catch((err) => console.error(err));
@@ -214,52 +214,73 @@ const Revaluation = () => {
                   </div>
                 </div>
 
-                <div className="revaluation-content-box">
-                  <p style={{ marginBottom: "14px" }}>
-                    Revaluation request for{" "}
-                    <strong style={{ color: "var(--text-1)" }}>
-                      {req.examType}
-                    </strong>{" "}
-                    in{" "}
-                    <strong style={{ color: "var(--text-1)" }}>
-                      {req.course}
-                    </strong>
-                    , class{" "}
-                    <strong style={{ color: "var(--text-1)" }}>
-                      {req.classId}
-                    </strong>
-                    .
-                  </p>
+               <div className="revaluation-content-box">
+  <p style={{ marginBottom: "14px" }}>
+    Revaluation request for{" "}
+    <strong style={{ color: "var(--text-1)" }}>
+      {req.examType}
+    </strong>{" "}
+    in{" "}
+    <strong style={{ color: "var(--text-1)" }}>
+      {req.course}
+    </strong>
+    , class{" "}
+    <strong style={{ color: "var(--text-1)" }}>
+      {req.classId}
+    </strong>.
+  </p>
 
-                  <button
-                    className="com-btn revalued-btn"
-                    onClick={() => setSelectedReq(req)}
-                  >
-                    ✏️ Update Mark
-                  </button>
+  {/* STUDENT REASON */}
+  {req.studentReason && (
+    <div
+      style={{
+        background: "#f8f9ff",
+        padding: "12px",
+        borderRadius: "8px",
+        marginBottom: "14px",
+        border: "1px solid #e0e6ff",
+      }}
+    >
+      <p style={{ fontWeight: "600", marginBottom: "4px" }}>
+        Student Reason:
+      </p>
 
-                  {selectedReq?._id === req._id && (
-                    <div style={{ marginTop: "10px" }}>
-                      <input
-                        type="number"
-                        placeholder="Enter new total mark"
-                        value={newMark}
-                        onChange={(e) => setNewMark(e.target.value)}
-                        style={{
-                          padding: "6px",
-                          marginRight: "10px",
-                        }}
-                      />
+      <p style={{ fontSize: "14px", color: "#555" }}>
+        {req.studentReason}
+      </p>
+    </div>
+  )}
 
-                      <button
-                        className="com-btn"
-                        onClick={() => submitMark(req._id)}
-                      >
-                        Submit
-                      </button>
-                    </div>
-                  )}
-                </div>
+  <button
+    className="com-btn revalued-btn"
+    onClick={() => setSelectedReq(req)}
+  >
+    ✏️ Update Mark
+  </button>
+
+  {selectedReq?._id === req._id && (
+    <div style={{ marginTop: "10px" }}>
+      <input
+        type="number"
+        placeholder="Enter new total mark"
+        value={newMark}
+        onChange={(e) => setNewMark(e.target.value)}
+        style={{
+          padding: "6px",
+          marginRight: "10px",
+        }}
+      />
+
+      <button
+        className="com-btn"
+        onClick={() => submitMark(req._id)}
+      >
+        Submit
+      </button>
+    </div>
+  )}
+</div>
+              
               </div>
             ))}
           </div>
