@@ -35,6 +35,7 @@ const ViewResult = () => {
         );
 
         const data = await res.json();
+        console.log("COURSES API RESPONSE:", data);
         setCourses(Array.isArray(data.courses) ? data.courses : []);
       } catch (err) {
         console.log(err);
