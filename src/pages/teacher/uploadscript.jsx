@@ -55,11 +55,11 @@ const UploadScripts = () => {
   // ── File handling ──
   const addFiles = (incoming) => {
     const valid = Array.from(incoming).filter(
-      (f) => f.type === "application/pdf" || f.type.startsWith("image/")
-    );
+  (f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf")
+);
 
     if (valid.length === 0) {
-      alert("Only PDF and image files are accepted.");
+      alert("Only PDF files are accepted.");
       return;
     }
 
@@ -247,19 +247,17 @@ const UploadScripts = () => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
             >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,image/*"
-                multiple
-                webkitdirectory="true"
-                directory="true"
-                style={{ display: "none" }}
-                onChange={handleFileInput}
-              />
+             <input
+  ref={fileInputRef}
+  type="file"
+  accept=".pdf"
+  multiple
+  style={{ display: "none" }}
+  onChange={handleFileInput}
+/>
               <span className="us-drop-icon">📄</span>
-              <p className="us-drop-title">Drop answer scripts or folders here</p>
-              <p className="us-drop-sub">or click to browse · PDF and images accepted</p>
+              <p className="us-drop-title">Drop answer scripts here</p>
+              <p className="us-drop-sub">or click to browse · PDF accepted</p>
 
               {/* Show selected file names inside dropzone */}
               {files.length > 0 && (
