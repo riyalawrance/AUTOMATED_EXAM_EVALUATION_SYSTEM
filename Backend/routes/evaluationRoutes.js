@@ -248,13 +248,17 @@ router.post("/run", async (req, res) => {
     // 🔥 NEW: decide scripts based on request
     let scriptPdfs = [];
     
-    if (scriptKeys && scriptKeys.length > 0) {
-      scriptPdfs = scriptKeys; // ✅ ONLY use uploaded files
-    } else {
-      // optional fallback (you can remove this if you want strict behavior)
-      scriptPdfs = await listPdfsS3(BUCKET, scriptsPrefix);
+    // 🔥 STRICT: only evaluate scripts sent from frontend
+    if (!scriptKeys || scriptKeys.length === 0) {
+      return res.status(400).json({
+        error: "No scripts provided for evaluation",
+      });
     }
     
+    const scriptPdfs = scriptKeys;
+    console.log("📥 Scripts received from frontend:");
+    console.log(scriptPdfs);
+        
     // validations
     if (!qpPdfs.length) {
       return res.status(400).json({
@@ -300,8 +304,11 @@ router.post("/run", async (req, res) => {
 
       try {
         const exists = await MarkMatrix.findOne({ scriptKey }).lean();
-        if (exists && !force) { skippedExisting++; continue; }
-
+        if (exists && !force) {
+        console.log("⏭ Skipping already evaluated:", scriptKey);
+        skippedExisting++;
+        continue;
+      }
         console.log(`\n---- Evaluating (${processed}/${scriptPdfs.length}): ${scriptKey} ----`);
 
         const scriptBytes = await downloadFromS3(BUCKET, scriptKey);
