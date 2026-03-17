@@ -254,7 +254,7 @@ router.post("/run", async (req, res) => {
       });
     }
     
-    const scriptPdfs = scriptKeys;
+    const scriptPdfs = scriptKeys.map(s => s.key);
     console.log("📥 Scripts received from frontend:");
     console.log(scriptPdfs);
         
@@ -295,7 +295,8 @@ router.post("/run", async (req, res) => {
     let updatedExisting = 0;
     let skippedExisting = 0;
     const failures = [];
-
+    console.log("Type of scriptKey:", typeof scriptPdfs[0]);
+    console.log("First scriptKey value:", scriptPdfs[0]);
     // ── Evaluation loop ──────────────────────────────────────────────────────
     for (const scriptKey of scriptPdfs) {
       processed++;
