@@ -114,7 +114,7 @@ router.get("/courses/:rollNo", async (req, res) => {
         _id: m.courseId._id,
         courseName: m.courseId.courseName,
       }));
-
+  .filter(Boolean);
     console.log("Courses returned:", courses);
 
     return res.json({
