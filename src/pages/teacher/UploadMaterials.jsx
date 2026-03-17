@@ -152,16 +152,29 @@ const UploadMaterials = () => {
       }
 
       console.log("Upload success:", uploadData);
+      const scriptKeys = uploadData?.files?.answer_scripts || [];
+      console.log("Scripts to evaluate:", scriptKeys);
+      if (!scriptKeys.length) {
+      throw new Error("No answer scripts uploaded properly");
+    }
+      console.log("Sending to evaluation API:", {
+      classId: exam.classId,
+      course: exam.course,
+      examType: exam.examType,
+      evalType: exam.evalType,
+      scriptKeys,
+    });
 
       const evalRes = await fetch(`${API_BASE}/api/evaluation/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          classId: exam.classId,
-          course: exam.course,
-          examType: exam.examType,
-          evalType: exam.evalType,
-        }),
+            classId: exam.classId,
+            course: exam.course,
+            examType: exam.examType,
+            evalType: exam.evalType,
+            scriptKeys, // 🔥 THIS IS THE FIX
+          }),
       });
 
       const evalText = await evalRes.text();
