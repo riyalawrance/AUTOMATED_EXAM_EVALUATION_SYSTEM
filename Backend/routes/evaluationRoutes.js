@@ -169,7 +169,7 @@ async function generateReferenceAnswers(ai, course, classId, examType, qpKey, qp
   for await (const chunk of stream) {
     const text =
       chunk?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
-     += text;
+     finalText+= text;
   }
 
   if (!) throw new Error("Empty reference answer result from Gemini");
