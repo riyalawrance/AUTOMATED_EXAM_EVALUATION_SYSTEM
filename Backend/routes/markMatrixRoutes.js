@@ -137,42 +137,35 @@ const parseResultTableForDisplay = (resultTable) => {
     .map((r) => r.trim())
     .filter((r) => r.startsWith("|"));
 
-  if (rows.length < 3) {
-    return { questions: [] };
-  }
+  if (rows.length < 3) return { questions: [] };
 
   const splitRow = (row) =>
     row.split("|").map((c) => c.trim()).filter(Boolean);
 
-  const headerCells = splitRow(rows[0]);
-  const dataCells   = splitRow(rows[2]);
+  const dataCells = splitRow(rows[2]);
 
-  // Header: Roll No | Q1 | Max Marks | Marks Awarded | Justification | Q2 | ...
-  // Data:   40      | 3  | 2         | Correct...    | 3             | 3  | ...
-  // 
-  // For Qn at header index i:
-  //   dataCells[i]   = max marks      (same index, Qn column has the max value in data)
-  //   dataCells[i+1] = marks awarded
-  //   dataCells[i+2] = justification
+  // Standard format: RollNo | Q1 | Max | Marks | Justification | Q2 | Max | Marks | Justification | ... | Total
+  // Skip index 0 (RollNo), skip last cell (Total)
+  // Groups of 4 starting at index 1: [Qn, Max, Marks, Justification]
 
   const questions = [];
 
-  headerCells.forEach((label, i) => {
-    const lower = label.toLowerCase();
-    // Only process Q1, Q2... Q12 etc — skip Roll No, Max Marks, Marks Awarded, Justification, Total Marks
-    if (!/^q\d+$/i.test(label)) return;
+  for (let i = 1; i < dataCells.length - 1; i += 4) {
+    const label = dataCells[i];
+    const max   = parseFloat(dataCells[i + 1]);
+    const marks = parseFloat(dataCells[i + 2]);
+    const reason = dataCells[i + 3] || "";
 
-    const max          = parseFloat(dataCells[i])     ?? 0;
-    const marksAwarded = parseFloat(dataCells[i + 1]) ?? 0;
-    const reason       = dataCells[i + 2]             || "";
+    // Stop if this doesn't look like a question label
+    if (!/^q\d+$/i.test(label)) break;
 
     questions.push({
-      question:        label,
-      max:             isNaN(max) ? 0 : max,
-      marks:           isNaN(marksAwarded) ? 0 : marksAwarded,
+      question: label,
+      max:      isNaN(max)   ? 0 : max,
+      marks:    isNaN(marks) ? 0 : marks,
       deductionReason: reason,
     });
-  });
+  }
 
   return { questions };
 };
