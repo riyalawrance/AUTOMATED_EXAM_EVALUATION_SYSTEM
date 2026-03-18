@@ -29,14 +29,6 @@ const UPLOAD_TILES = [
     dir: false,
   },
   {
-    icon: "📂",
-    label: "Answer Scripts",
-    hint: "Upload folder",
-    accept: "",
-    multiple: true,
-    dir: true,
-  },
-  {
     icon: "📖",
     label: "Reference Texts",
     hint: "PDF only",
@@ -45,7 +37,7 @@ const UPLOAD_TILES = [
     dir: false,
   },
 ];
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const EvaluatingModal = () => (
   <div className="eval-overlay">
     <div className="eval-modal">
@@ -152,20 +144,7 @@ const UploadMaterials = () => {
       }
 
       console.log("Upload success:", uploadData);
-      const scriptKeys = Array.isArray(uploadData?.uploadedFiles)
-      ? uploadData.uploadedFiles.map(f => ({ key: f.key }))
-      : [];
-      console.log("Scripts to evaluate:", scriptKeys);
-      if (!scriptKeys.length) {
-      throw new Error("No answer scripts uploaded properly");
-    }
-      console.log("Sending to evaluation API:", {
-      classId: exam.classId,
-      course: exam.course,
-      examType: exam.examType,
-      evalType: exam.evalType,
-      scriptKeys,
-    });
+      const uploadedKeys = uploadData.uploaded;
 
       const evalRes = await fetch(`${API_BASE}/api/evaluation/run`, {
         method: "POST",
@@ -175,7 +154,7 @@ const UploadMaterials = () => {
             course: exam.course,
             examType: exam.examType,
             evalType: exam.evalType,
-            scriptKeys, // 🔥 THIS IS THE FIX
+            uploadedKeys, // 🔥 THIS is the fix
           }),
       });
 
