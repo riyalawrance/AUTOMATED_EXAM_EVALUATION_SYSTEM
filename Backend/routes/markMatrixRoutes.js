@@ -144,25 +144,32 @@ const parseResultTableForDisplay = (resultTable) => {
 
   const dataCells = splitRow(rows[2]);
 
-  // Standard format: RollNo | Q1 | Max | Marks | Justification | Q2 | Max | Marks | Justification | ... | Total
-  // Skip index 0 (RollNo), skip last cell (Total)
-  // Groups of 4 starting at index 1: [Qn, Max, Marks, Justification]
-
   const questions = [];
 
-  for (let i = 1; i < dataCells.length - 1; i += 4) {
-    const label = dataCells[i];
-    const max   = parseFloat(dataCells[i + 1]);
-    const marks = parseFloat(dataCells[i + 2]);
-    const reason = dataCells[i + 3] || "";
+  // Find the first Q label to determine starting index
+  let startIndex = -1;
+  for (let i = 0; i < dataCells.length; i++) {
+    if (/^q\d+$/i.test(dataCells[i])) {
+      startIndex = i;
+      break;
+    }
+  }
 
-    // Stop if this doesn't look like a question label
+  if (startIndex === -1) return { questions: [] };
+
+  // From startIndex, groups of 4: Qn | Max | Marks | Justification
+  for (let i = startIndex; i < dataCells.length - 1; i += 4) {
+    const label  = dataCells[i];
     if (!/^q\d+$/i.test(label)) break;
 
+    const max    = parseFloat(dataCells[i + 1]) || 0;
+    const marks  = parseFloat(dataCells[i + 2]) || 0;
+    const reason = dataCells[i + 3] || "";
+
     questions.push({
-      question: label,
-      max:      isNaN(max)   ? 0 : max,
-      marks:    isNaN(marks) ? 0 : marks,
+      question:        label,
+      max:             isNaN(max)   ? 0 : max,
+      marks:           isNaN(marks) ? 0 : marks,
       deductionReason: reason,
     });
   }
