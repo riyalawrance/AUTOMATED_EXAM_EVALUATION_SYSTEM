@@ -14,14 +14,12 @@ import { Buffer } from "buffer";
 // ─── Helper: strip empty first/last cells from split("|") ───────────────────
 function splitRow(line) {
   const parts = line.split("|");
-  // split("|") on "| a | b |" gives ["", " a ", " b ", ""]
-  // so strip index 0 and last
   return parts
     .filter((_, i, arr) => i !== 0 && i !== arr.length - 1)
     .map((c) => c.trim());
 }
 
-// ─── Helper: extract awarded total from result table ────────────────────────
+// ─── Helper: extract awarded total — always the LAST cell of the last row ────
 function extractTotal(resultTable) {
   if (!resultTable) return null;
 
@@ -32,52 +30,26 @@ function extractTotal(resultTable) {
 
   if (lines.length < 3) return null;
 
-  const header  = splitRow(lines[0]);
-  // last line = student data row (skip separator at lines[1])
-  const dataRow = splitRow(lines[lines.length - 1]);
+  const dataRow  = splitRow(lines[lines.length - 1]);
+  const lastCell = dataRow[dataRow.length - 1];
 
-  console.log("🔍 [extractTotal] Header:", header);
-  console.log("🔍 [extractTotal] DataRow:", dataRow);
+  console.log("🔍 [extractTotal] lastCell:", lastCell);
 
-  const totalIndex = header.findIndex((h) =>
-    h.toLowerCase().includes("total")
-  );
-
-  console.log("🔍 [extractTotal] totalIndex:", totalIndex, "| cell:", dataRow[totalIndex]);
-
-  if (totalIndex === -1) return null;
-
-  const n = Number(String(dataRow[totalIndex]).replace(/[^\d.]/g, ""));
-  return Number.isFinite(n) ? n : null;
+  const n = Number(String(lastCell).replace(/[^\d.]/g, ""));
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-// ─── Helper: extract max marks by summing all "Max Marks" columns ────────────
-function extractMaxMarks(resultTable) {
-  if (!resultTable) return null;
-
-  const lines = resultTable
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l.startsWith("|"));
-
-  if (lines.length < 3) return null;
-
-  const header  = splitRow(lines[0]);
-  const dataRow = splitRow(lines[lines.length - 1]);
-
-  console.log("🔍 [extractMaxMarks] Header:", header);
-  console.log("🔍 [extractMaxMarks] DataRow:", dataRow);
-
-  let totalMax = 0;
-  header.forEach((col, i) => {
-    if (col.toLowerCase().includes("max marks")) {
-      const n = Number(String(dataRow[i] ?? "").replace(/[^\d.]/g, ""));
-      if (Number.isFinite(n) && n > 0) totalMax += n;
-    }
-  });
-
-  console.log("🔍 [extractMaxMarks] totalMax:", totalMax);
-  return totalMax > 0 ? totalMax : null;
+// ─── Helper: extract max marks from Gemini's MAX_MARKS: line ─────────────────
+// Gemini reads the question paper directly and outputs the total max marks
+function extractMaxMarks(fullText) {
+  const match = fullText.match(/MAX_MARKS:\s*([\d.]+)/i);
+  if (!match) {
+    console.log("🔍 [extractMaxMarks] MAX_MARKS line not found in Gemini response");
+    return null;
+  }
+  const n = Number(match[1]);
+  console.log("🔍 [extractMaxMarks] found:", n);
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 function guessMime(key) {
@@ -229,37 +201,59 @@ async function generateReferenceAnswers(ai, course, classId, examType, qpKey, qp
 const router = express.Router();
 const MODEL = "gemini-2.5-flash";
 
+// ✅ evalType is stressed at the top, middle, and bottom of the prompt
 const buildEvalPrompt = (evalType) => `
 You are an expert academic evaluator.
 
-Your task is to evaluate student answer sheets using the provided Question Paper and Textbook as the primary reference.
-
-EVALUATION TYPE:
+════════════════════════════════════════════════════════════════
+⚠️  EVALUATION TYPE — THIS IS YOUR PRIMARY INSTRUCTION:
 ${evalType}
 
+You MUST strictly follow this evaluation type for EVERY question and EVERY mark decision.
+This overrides any default assumptions you may have about marking.
+Do NOT deviate from this evaluation type under any circumstance.
+════════════════════════════════════════════════════════════════
+
 INPUTS PROVIDED:
-1. Question Paper
-2. Marking Scheme (if provided)
-3. Official Textbook Content (if provided)
+1. Question Paper — use this to identify ALL questions and their exact max marks
+2. Marking Scheme (if provided) — use as secondary reference for awarding marks
+3. Official Textbook Content (if provided) — use as primary content reference
 4. Student Answer Sheet (File name = Student Roll Number)
 
-EVALUATION INSTRUCTIONS:
-1. Use the Question Paper to identify ALL questions and their max marks.
-2. You MUST evaluate EVERY question in the paper — do not stop early.
-3. Use the textbook as primary reference.
-4. Follow the selected evaluation type while awarding marks.
-5. Award full/partial/zero marks with concise justification per question.
-6. If a question was not attempted, award 0 marks with justification "Not attempted".
+STEP 1 — READ THE QUESTION PAPER FIRST:
+* Identify every question number and its exact max marks as printed in the question paper.
+* Sum all question max marks to get the total maximum marks for this paper.
+* Output this on the very first line of your response as: MAX_MARKS: [number]
+* Do NOT guess or assume max marks — read them directly from the question paper.
 
-OUTPUT FORMAT — output ONLY this exact markdown table, nothing else:
+STEP 2 — EVALUATE EVERY QUESTION:
+* You MUST evaluate EVERY question in the question paper — do not skip any.
+* Students may have answered extra questions — evaluate ONLY the questions listed in the question paper.
+* For each question, apply the EVALUATION TYPE strictly while deciding marks.
+* Award full / partial / zero marks along with a concise justification per question.
+* If a question was not attempted by the student, award 0 with justification "Not attempted".
+
+════════════════════════════════════════════════════════════════
+⚠️  EVALUATION TYPE REMINDER — apply this to every single mark decision:
+${evalType}
+════════════════════════════════════════════════════════════════
+
+OUTPUT FORMAT — your entire response must follow this exact structure, nothing else:
+
+MAX_MARKS: [total maximum marks from the question paper]
+
 | Roll No | Q1 | Max Marks | Marks Awarded | Justification | Q2 | Max Marks | Marks Awarded | Justification | ... (repeat for ALL questions) | Total Marks |
+|---|---|---|---|---|---|---|---|---|---|
+| [rollNo] | [Q1 label] | [max] | [awarded] | [justification] | [Q2 label] | [max] | [awarded] | [justification] | ... | [total awarded] |
 
 CRITICAL OUTPUT RULES:
-- Output the table in ONE single response. Do not stop mid-row.
-- Every row must be complete from Roll No to Total Marks.
-- Do not add any text before or after the table.
-- Do not say "Here is the evaluation" or any preamble.
-- Start your response directly with | Roll No |
+- Line 1 MUST be: MAX_MARKS: [number]
+- Line 2 MUST be blank
+- Line 3 onwards: the markdown table starting with | Roll No |
+- Output the table in ONE single complete response — do not stop mid-row
+- Every row must be complete from Roll No to Total Marks
+- Do NOT add any other text, preamble, explanation, or conclusion
+- Do NOT say "Here is the evaluation" or anything similar
 `.trim();
 
 /**
@@ -278,10 +272,10 @@ router.post("/run", async (req, res) => {
     if (!BUCKET) return res.status(500).json({ error: "Missing S3_BUCKET in Backend .env" });
     if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: "Missing GEMINI_API_KEY in Backend .env" });
 
-    const basePrefix    = `${course}/${classId}/${examType}`;
-    const qpPrefix      = `${basePrefix}/question-paper/`;
-    const msPrefix      = `${basePrefix}/marking-scheme/`;
-    const refPrefix     = `${basePrefix}/reference-text/`;
+    const basePrefix = `${course}/${classId}/${examType}`;
+    const qpPrefix   = `${basePrefix}/question-paper/`;
+    const msPrefix   = `${basePrefix}/marking-scheme/`;
+    const refPrefix  = `${basePrefix}/reference-text/`;
 
     const [qpPdfs, msPdfs, refPdfs] = await Promise.all([
       listPdfsS3(BUCKET, qpPrefix),
@@ -289,7 +283,6 @@ router.post("/run", async (req, res) => {
       listPdfsS3(BUCKET, refPrefix),
     ]);
 
-    // only evaluate scripts sent from frontend
     if (!scriptKeys || scriptKeys.length === 0) {
       return res.status(400).json({ error: "No scripts provided for evaluation" });
     }
@@ -304,7 +297,7 @@ router.post("/run", async (req, res) => {
       return res.status(400).json({ error: `No Question Paper PDFs found at prefix: ${qpPrefix}` });
     }
     if (!scriptPdfs.length) {
-      return res.status(400).json({ error: "No scripts provided for evaluation" });
+      return res.status(400).json({ error: "No valid script keys provided" });
     }
 
     const qpKey  = qpPdfs[0];
@@ -313,6 +306,7 @@ router.post("/run", async (req, res) => {
 
     console.log("\n=== EVALUATION RUN ===");
     console.log("classId:", classId, "| course:", course, "| examType:", examType);
+    console.log("evalType:", evalType);
     console.log("force:", !!force, "| bucket:", BUCKET);
     console.log("QP:", qpKey, "| MS:", msKey, "| REF:", refKey);
     console.log("scripts found:", scriptPdfs.length);
@@ -325,11 +319,11 @@ router.post("/run", async (req, res) => {
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    let processed        = 0;
-    let newlySaved       = 0;
-    let updatedExisting  = 0;
-    let skippedExisting  = 0;
-    const failures       = [];
+    let processed       = 0;
+    let newlySaved      = 0;
+    let updatedExisting = 0;
+    let skippedExisting = 0;
+    const failures      = [];
 
     // ── Evaluation loop ──────────────────────────────────────────────────────
     for (const scriptKey of scriptPdfs) {
@@ -388,14 +382,16 @@ router.post("/run", async (req, res) => {
           finalText += text;
         }
 
+        // ✅ extract maxMarks from full Gemini response BEFORE slicing the table
+        const maxMarks = extractMaxMarks(finalText);
+
         const tableStart = finalText.indexOf("| Roll No");
         if (tableStart === -1) throw new Error("Gemini did not return a valid table");
         const resultTable = finalText.slice(tableStart).trim();
         if (!resultTable) throw new Error("Empty result from Gemini");
 
-        // ── extract marks ────────────────────────────────────────────────────
+        // ✅ extract totalMarks from last cell of last data row
         const totalMarks = extractTotal(resultTable);
-        const maxMarks   = extractMaxMarks(resultTable);
 
         console.log(`📊 rollNo=${rollNo} | totalMarks=${totalMarks} | maxMarks=${maxMarks}`);
 
@@ -405,8 +401,8 @@ router.post("/run", async (req, res) => {
             $set: {
               rollNo, scriptKey, classId, course, examType,
               resultTable,
-              totalMarks,   // ✅ marks awarded to student
-              maxMarks,     // ✅ maximum possible marks
+              totalMarks,   // marks awarded to student
+              maxMarks,     // total max marks from question paper
               status: "done",
               error: "",
             },
