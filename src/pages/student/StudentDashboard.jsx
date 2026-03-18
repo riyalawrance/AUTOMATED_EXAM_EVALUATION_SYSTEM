@@ -3,27 +3,51 @@ import { useNavigate } from "react-router-dom";
 import "../admin/AdminDashboard.css";
 
 const NAV_ITEMS = [
-  { label: "Dashboard",      icon: "⊞", path: "/student",            active: true },
+  { label: "Dashboard", icon: "⊞", path: "/student", active: true },
+    { label: "Profile", icon: "👤", path: "/profile" }
 ];
 
 const FEATURE_CARDS = [
-  { label: "View Result",     icon: "📊", sub: "Check your exam scores",       path: "/student/result"     },
-  { label: "View Answer Key", icon: "📖", sub: "Browse approved model answers", path: "/student/answer-key" },
+  {
+    label: "View Result",
+    icon: "📊",
+    sub: "Check your exam scores",
+    path: "/student/result",
+  },
+  {
+    label: "View Answer Key",
+    icon: "📖",
+    sub: "Browse approved model answers",
+    path: "/student/answer-key",
+  },
 ];
-
 const StudentDashboard = () => {
   const navigate = useNavigate();
 
+  const student = JSON.parse(localStorage.getItem("user"));
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
+    navigate("/", { replace: true });
+  };
+
   return (
     <div className="container">
-      {/* ── Sidebar ── */}
+
+      {/* Sidebar */}
       <aside className="sidebar">
+
         <h2 className="logo">SAGE</h2>
 
         <div className="user-info">
-          <div className="avatar">S</div>
+          <div className="avatar">
+            {student?.name?.charAt(0)?.toUpperCase()}
+          </div>
+
           <div className="user-details">
-            <h4>Ammu</h4>
+            <h4>{student?.name}</h4>
             <p>Student</p>
           </div>
         </div>
@@ -43,22 +67,27 @@ const StudentDashboard = () => {
 
       </aside>
 
-      {/* ── Main ── */}
+      {/* Main */}
       <main className="main">
+
         <div className="logout-container">
-          <button
-            className="com-btn logout-btn-top"
-            onClick={() => navigate("/login")}
-          >
+          <button className="com-btn logout-btn-top" onClick={handleLogout}>
             ↩ Logout
           </button>
         </div>
 
+        {/* Welcome */}
         <h1 className="page-title">
-          Student <span>Dashboard</span>
+          Welcome, <span>{student?.name}</span>
         </h1>
 
+        <p style={{ color: "var(--text-3)", marginBottom: "30px" }}>
+          Access your results and approved answer keys from here.
+        </p>
+
+        {/* Dashboard Cards */}
         <div className="card-grid">
+
           {FEATURE_CARDS.map(({ label, icon, sub, path }) => (
             <div
               key={label}
@@ -70,8 +99,11 @@ const StudentDashboard = () => {
               <p className="card-sub">{sub}</p>
             </div>
           ))}
+
         </div>
+
       </main>
+
     </div>
   );
 };

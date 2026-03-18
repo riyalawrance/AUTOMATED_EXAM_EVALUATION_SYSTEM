@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/auth/Login";
+import Profile from "./pages/Profile";
 
 /* ========== Student Pages ========== */
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -15,6 +16,8 @@ import ReferenceAnswer from "./pages/teacher/ReferenceAnswers";
 import Revaluation from "./pages/teacher/Revaluation";
 import UploadMaterials from "./pages/teacher/UploadMaterials";
 import UpdateMark from "./pages/teacher/UpdateMark";
+import Uploadscript from "./pages/teacher/uploadscript";
+import Courseclass from "./pages/teacher/CourseClass";
 
 /* ========== Admin Pages ========== */
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -31,6 +34,9 @@ function App() {
       {/* ===== Login ===== */}
       <Route path="/login" element={<Login />} />
 
+      {/* ===== Profile ===== */}
+      <Route path="/profile" element={<Profile />} />
+
       {/* ===== Student Routes ===== */}
       <Route path="/student" element={<StudentDashboard />} />
       <Route path="/student/answer-key" element={<ViewAnswerKey />} />
@@ -44,6 +50,9 @@ function App() {
       <Route path="/reference-answer" element={<ReferenceAnswer />} />
       <Route path="/revaluation" element={<Revaluation />} />
       <Route path="/update-mark" element={<UpdateMark />} /> 
+      <Route path="/uploadscript" element={<Uploadscript />} />
+      <Route path="/courseclass" element={<Courseclass />} />
+
       
       {/* ===== Admin Routes ===== */}
       <Route path="/admin" element={<AdminDashboard />} />

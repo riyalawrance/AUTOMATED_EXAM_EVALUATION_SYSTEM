@@ -1,38 +1,95 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../admin/AdminDashboard.css";
 
 const NAV_ITEMS = [
-  { label: "Dashboard",        icon: "⊞", path: "/teacher"                        },
-  { label: "Evaluation",       icon: "📋", path: "/evaluation"                     },
-  { label: "View Results",     icon: "📊", path: "/view-mark"                      },
-  { label: "Reference Answer", icon: "📖", path: "/reference-answer", active: true },
-  { label: "Revaluation",      icon: "🔄", path: "/revaluation"                    },
+  { label: "Dashboard", icon: "⊞", path: "/teacher" },
+  { label: "Evaluation", icon: "📋", path: "/evaluation" },
+  { label: "View Results", icon: "📊", path: "/view-mark" },
+  { label: "Reference Answer", icon: "📖", path: "/teacher/view-reference", active: true },
+  { label: "Revaluation", icon: "🔄", path: "/revaluation" },
+  {label:"My Classes",icon:"🏫",path:"/courseclass"},
 ];
-
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const ReferenceAnswer = () => {
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [approved, setApproved]     = useState(false);
   const navigate = useNavigate();
 
-  const handleFilter = () => {
-    setShowAnswer(true);
-    setApproved(false);
+  const [classes, setClasses] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [exams, setExams] = useState([]);
+
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedExam, setSelectedExam] = useState("");
+
+  const [reference, setReference] = useState(null);
+
+  // ===============================
+  // Load Dropdown Data
+  // ===============================
+  useEffect(() => {
+    fetch(`${API_BASE}/api/reference/dropdowns`)
+      .then(res => res.json())
+      .then(data => {
+        setClasses(data.classes);
+        setCourses(data.courses);
+        setExams(data.exams);
+      })
+      .catch(err => console.error(err));
+  }, []);
+
+  // ===============================
+  // View Answer
+  // ===============================
+  const handleView = async () => {
+    if (!selectedClass || !selectedCourse || !selectedExam) {
+      alert("Please select Class, Course and Exam");
+      return;
+    }
+
+    const res = await fetch(
+      `${API_BASE}/api/reference/view`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          className: selectedClass,
+          courseName: selectedCourse,
+          examType: selectedExam
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message);
+      return;
+    }
+
+    setReference(data);
+
+    // 🔥 Open PDF
+    console.log("PDF LINK:", data.pdfLink);
+window.open(data.fileUrl, "_blank");
+  };
+
+  // ===============================
+  // Approve
+  // ===============================
+  const handleApprove = async () => {
+    await fetch(
+      `${API_BASE}/api/reference/approve/${reference._id}`,
+      { method: "PUT" }
+    );
+
+    setReference({ ...reference, status: true });
   };
 
   return (
     <div className="container">
-      {/* ── Sidebar ── */}
       <aside className="sidebar">
         <h2 className="logo">SAGE</h2>
-
-        <div className="user-info">
-          <div className="avatar">T</div>
-          <div className="user-details">
-            <h4>Teacher Name</h4>
-            <p>Teacher</p>
-          </div>
-        </div>
 
         <ul className="sidebar-cards">
           {NAV_ITEMS.map(({ label, icon, path, active }) => (
@@ -46,93 +103,94 @@ const ReferenceAnswer = () => {
             </li>
           ))}
         </ul>
-
       </aside>
 
-      {/* ── Main ── */}
       <main className="main">
-        <div className="logout-container">
-          <button
-            className="com-btn logout-btn-top"
-            onClick={() => navigate("/login")}
-          >
-            ↩ Logout
-          </button>
-        </div>
-
         <h1 className="page-title">
           Reference <span>Answer</span>
         </h1>
 
         {/* Filter Card */}
         <div className="com-card filter-card">
+
           <div className="filter-group">
-            <label>Class</label>
-            <select defaultValue="">
-              <option value="" disabled>Select Class</option>
-              <option>S1</option><option>S2</option><option>S3</option>
-              <option>S4</option><option>S5</option><option>S6</option>
-            </select>
-          </div>
+  <label>Class</label>
+
+  <select
+    value={selectedClass}
+    onChange={async (e) => {
+
+      const value = e.target.value;
+      setSelectedClass(value);
+
+      if (!value) return;
+
+      const res = await fetch(
+        `${API_BASE}/api/reference/courses/${value}`
+      );
+
+      const data = await res.json();
+
+      setCourses(data.courses || []);
+    }}
+  >
+    {/* ADDED */}
+    <option value="">Select Class</option>
+
+    {/* ADDED */}
+   {classes.map((cls) => (
+  <option key={cls._id} value={cls.classId}>
+    {cls.classId}
+  </option>
+))}
+
+  </select>
+
+</div>
 
           <div className="filter-group">
             <label>Course</label>
-            <select defaultValue="">
-              <option value="" disabled>Select Course</option>
-              <option>Data Structures</option>
-              <option>DBMS</option>
-              <option>OS</option>
+            <select onChange={(e) => setSelectedCourse(e.target.value)}>
+              <option value="">Select Course</option>
+              {courses.map(c => (
+               <option key={c._id} value={c.courseName}>
+  {c.courseName}
+</option>
+              ))}
             </select>
           </div>
 
           <div className="filter-group">
             <label>Exam</label>
-            <select defaultValue="">
-              <option value="" disabled>Select Exam</option>
-              <option>Series Test 1</option>
-              <option>Series Test 2</option>
+            <select onChange={(e) => setSelectedExam(e.target.value)}>
+              <option value="">Select Exam</option>
+              {exams.map(e => (
+  <option key={e}>{e}</option>
+))}
             </select>
           </div>
 
-          <button className="com-btn view-btn" onClick={handleFilter}>
+          <button className="com-btn view-btn" onClick={handleView}>
             View Answer
           </button>
         </div>
 
-        {/* Reference Answer Panel */}
-        {showAnswer && (
+        {/* Reference Panel */}
+        {reference && (
           <div className="com-card reference-card">
             <div className="reference-header">
-              <h3 style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "17px",
-                fontWeight: 700,
-                color: "var(--text-1)",
-              }}>
-                Reference Answer
-              </h3>
+              <h3>Reference Answer</h3>
 
-              {!approved ? (
+              {!reference.status ? (
                 <button
                   className="com-btn approve-btn"
-                  onClick={() => setApproved(true)}
+                  onClick={handleApprove}
                 >
                   ✓ Approve
                 </button>
               ) : (
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span className="approved-badge">✓ Approved</span>
-                  <button className="com-btn view-btn">View</button>
-                </div>
+                <span className="approved-badge">✓ Approved</span>
               )}
-            </div>
-
-            <div className="reference-content-box">
-              <p>
-                The reference answer for the selected exam will appear here. Review
-                the model answer carefully before approving it for student
-                revaluation requests.
-              </p>
             </div>
           </div>
         )}

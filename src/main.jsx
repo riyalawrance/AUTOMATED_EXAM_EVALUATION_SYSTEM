@@ -11,7 +11,7 @@ import App from "./App";
 //   • Login.css uses    → [data-theme="light"] / [data-theme="dark"] selectors
 // Without this, <html> has no data-theme on load so :root (dark) always wins.
 // ─────────────────────────────────────────────────────────────────────────────
-const savedTheme = localStorage.getItem("sage-theme") || "dark";
+const savedTheme = localStorage.getItem("sage-theme") || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

@@ -8,18 +8,13 @@ const NAV_ITEMS = [
   { label: "View Results",     icon: "📊", path: "/view-mark"        },
   { label: "Reference Answer", icon: "📖", path: "/reference-answer" },
   { label: "Revaluation",      icon: "🔄", path: "/revaluation", active: true },
+  {label:"My Classes",icon:"🏫",path:"/courseclass"},
 ];
 
-// Sample original marks — in a real app this comes from your backend
-// keyed by rollNo + course + exam
-const ORIGINAL_MARKS = {
-  "S2-101_Data Structures_Series Test 1": { q1: 8, q2: 7, q3: 9  },
-  "S3-204_DBMS_Series Test 2":            { q1: 6, q2: 5, q3: 7  },
-};
-
 const MAX_PER_Q = 10;
-
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const UpdateMark = () => {
+  const teacher = JSON.parse(localStorage.getItem("user"));
   const navigate  = useNavigate();
   const location  = useLocation();
 
@@ -82,7 +77,10 @@ const UpdateMark = () => {
           <h2 className="logo">SAGE</h2>
           <div className="user-info">
             <div className="avatar">T</div>
-            <div className="user-details"><h4>Teacher Name</h4><p>Teacher</p></div>
+             <div className="user-details">
+            <h4>{teacher?.name}</h4>
+            <p>Teacher</p>
+          </div>
           </div>
           <ul className="sidebar-cards">
             {NAV_ITEMS.map(({ label, icon, path, active }) => (
@@ -142,7 +140,7 @@ const UpdateMark = () => {
       <main className="main">
         <div className="logout-container">
           <button className="com-btn logout-btn-top" onClick={() => navigate("/login")}>
-            ↩ Logout
+            ↩ Back
           </button>
         </div>
 
