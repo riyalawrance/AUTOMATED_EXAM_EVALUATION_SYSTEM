@@ -510,13 +510,13 @@ html, body {
   gap: 8px;
 }
 
-.com-btn.inline-btn {
+.inline-btn {
   width: auto;
   padding: 10px 20px;
   border-radius: var(--r-md);
 }
 
-.com-btn.ghost-btn {
+.ghost-btn {
   background: transparent;
   color: var(--text-2);
   border: 1px solid var(--border);
@@ -524,7 +524,7 @@ html, body {
   border-radius: var(--r-md);
 }
 
-.com-btn.ghost-btn:hover {
+.ghost-btn:hover {
   background: var(--accent-soft);
   border-color: var(--border-bright);
   color: var(--accent);
