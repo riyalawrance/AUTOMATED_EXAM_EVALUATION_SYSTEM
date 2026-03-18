@@ -182,15 +182,14 @@ const ViewResult = () => {
             </select>
           </div>
           <button
-            className="com-btn view-btn"
-            style={{ height: "42px" }}
+            className="com-btn view-btn inline-btn"
             onClick={handleView}
           >
             View Results
           </button>
         </div>
 
-        {message && <p style={{ marginTop: "20px", color: "orange" }}>{message}</p>}
+        {message && <p className="vr-message">{message}</p>}
 
         {/* Results table */}
         {results.length > 0 && (
@@ -206,7 +205,7 @@ const ViewResult = () => {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
                 <p style={{ fontWeight: 600 }}>{results.length} students</p>
-                <button className="com-btn" style={{ padding: "8px 14px" }}>
+                <button className="com-btn ghost-btn inline-btn">
                   Export Excel
                 </button>
               </div>
@@ -243,8 +242,7 @@ const ViewResult = () => {
                         <td>{pct}%</td>
                         <td>
                           <button
-                            className="com-btn"
-                            style={{ padding: "6px 12px", fontSize: "12px" }}
+                            className="com-btn view-btn"
                             onClick={() => setExpandedRollNo(isOpen ? null : row.rollNo)}
                           >
                             {isOpen ? "Hide" : "View"}
@@ -255,8 +253,8 @@ const ViewResult = () => {
                       {/* ── Expanded detail — identical to student view ── */}
                       {isOpen && (
                         <tr>
-                          <td colSpan={5} style={{ background: "#fafafa", padding: "0" }}>
-                            <div style={{ padding: "16px 12px" }}>
+                          <td colSpan={5} className="vr-expanded-td">
+                            <div className="vr-expanded-inner">
 
                               {/* Summary header — mirrors student vsr-summary-row */}
                               <div className="vsr-summary-row">
