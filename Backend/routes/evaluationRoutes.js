@@ -7,8 +7,8 @@ import s3 from "../utils/s3Client.js";
 import { GetObjectCommand, ListObjectsV2Command, PutObjectCommand } from "@aws-sdk/client-s3";
 import { GoogleGenAI } from "@google/genai";
 
-import MarkMatrix    from "../models/MarkMatrix.js";   // ✅ existing — evaluation results
-import Result        from "../models/Result.js";        // ✅ new — OCR extracted text
+import MarkMatrix     from "../models/MarkMatrix.js";
+import Result         from "../models/Result.js";
 import ReferenceAnswer from "../models/ReferenceAnswer.js";
 import { Buffer } from "buffer";
 
@@ -113,8 +113,103 @@ async function listPdfsS3(bucket, prefix) {
   return out.map((x) => x.key);
 }
 
-// ─── Reference Answer Generation ────────────────────────────────────────────
+// ─── Improved Evaluation Prompt ──────────────────────────────────────────────
+const buildEvalPrompt = (evalType) => `
+You are a senior academic examiner with 20+ years of experience in fair, generous marking.
 
+════════════════════════════════════════════════════════════════
+⚠️  EVALUATION TYPE — THIS IS YOUR PRIMARY INSTRUCTION:
+${evalType}
+════════════════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🟢 FAIR MARKING PRINCIPLES — MANDATORY — APPLY TO EVERY QUESTION:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. AWARD MARKS FOR CORRECT MEANING, NOT EXACT WORDING.
+   - If the student expresses the right concept in their own words → award full marks.
+   - Do NOT penalize paraphrasing, synonyms, or different-but-correct explanations.
+
+2. GIVE GENEROUS PARTIAL MARKS.
+   - If a student gets some points of a multi-mark question correct, award marks proportionally.
+   - Example: 3 correct points out of 5 → award 3 marks, not 0.
+   - Never award 0 for an answer that shows any correct understanding.
+
+3. IGNORE SPELLING AND GRAMMAR ERRORS.
+   - Evaluate the technical content and meaning only.
+   - Spelling mistakes, grammatical errors, and poor sentence structure must NOT reduce marks.
+
+4. BE LENIENT WITH OCR/HANDWRITING ERRORS.
+   - The answer sheet was handwritten and OCR-transcribed. Some words may be garbled.
+   - If a garbled word is clearly meant to be a technical term → treat it as correct.
+   - Give benefit of the doubt when transcription quality may have affected the answer.
+
+5. AWARD MARKS FOR CORRECT EXAMPLES AND DIAGRAMS DESCRIBED IN TEXT.
+   - If a student describes a diagram or gives a valid example, award marks for it.
+
+6. DO NOT PENALIZE FOR MISSING EXAMPLES unless the question EXPLICITLY asks for one.
+
+7. WHEN IN DOUBT → AWARD THE HIGHER MARK.
+   - If you are unsure whether a point deserves a mark, award it.
+   - A student should never lose marks due to ambiguity in their answer.
+
+8. NEVER AWARD LESS THAN HALF MARKS for an answer that shows clear understanding of the topic,
+   even if some details are missing.
+
+9. DO NOT COMPARE STUDENT ANSWERS TO THE REFERENCE ANSWER WORD-FOR-WORD.
+   - The reference answer is a guide, not a template. Alternate correct answers must be accepted.
+
+10. MAXIMUM GENEROSITY RULE:
+    - Your goal is to find reasons to AWARD marks, not reasons to DEDUCT them.
+    - A student who clearly understands the concept deserves full or near-full marks.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INPUTS PROVIDED:
+1. Question Paper — use this to identify ALL questions and their exact max marks
+2. Marking Scheme (if provided) — use as a guide, not a strict checklist
+3. Reference Answer (if provided) — use as one acceptable answer, not the only answer
+4. Student Answer Sheet (File name = Student Roll Number)
+
+STEP 1 — READ THE QUESTION PAPER FIRST:
+* Identify every question number and its exact max marks as printed in the question paper.
+* Sum all question max marks to get the total maximum marks for this paper.
+* Output this on the very first line of your response as: MAX_MARKS: [number]
+* Do NOT guess or assume max marks — read them directly from the question paper.
+
+STEP 2 — EVALUATE EVERY QUESTION:
+* You MUST evaluate EVERY question in the question paper — do not skip any.
+* Students may have answered extra questions — evaluate ONLY the questions listed in the question paper.
+* Apply the FAIR MARKING PRINCIPLES above strictly to every mark decision.
+* Award full / partial / zero marks along with a concise justification per question.
+* If a question was not attempted by the student, award 0 with justification "Not attempted".
+* For every attempted answer, justify why marks WERE awarded, not why they were deducted.
+
+════════════════════════════════════════════════════════════════
+⚠️  REMINDER — FAIR MARKING PRINCIPLES apply to EVERY single mark decision.
+    WHEN IN DOUBT → AWARD THE HIGHER MARK.
+    evalType context: ${evalType}
+════════════════════════════════════════════════════════════════
+
+OUTPUT FORMAT — your entire response must follow this exact structure, nothing else:
+
+MAX_MARKS: [total maximum marks from the question paper]
+
+| Roll No | Q1 | Max Marks | Marks Awarded | Justification | Q2 | Max Marks | Marks Awarded | Justification | ... (repeat for ALL questions) | Total Marks |
+|---|---|---|---|---|---|---|---|---|---|
+| [rollNo] | [Q1 label] | [max] | [awarded] | [justification] | ... | [total awarded] |
+
+CRITICAL OUTPUT RULES:
+- Line 1 MUST be: MAX_MARKS: [number]
+- Line 2 MUST be blank
+- Line 3 onwards: the markdown table starting with | Roll No |
+- Output the table in ONE single complete response — do not stop mid-row
+- Every row must be complete from Roll No to Total Marks
+- Do NOT add any other text, preamble, explanation, or conclusion
+- Do NOT say "Here is the evaluation" or anything similar
+`.trim();
+
+// ─── Reference Answer Generation ────────────────────────────────────────────
 const REFERENCE_PROMPT = `
 You are a senior academic examiner. Generate concise, mark-scoring reference answers for ALL questions in the Question Paper.
 
@@ -196,82 +291,11 @@ async function generateReferenceAnswers(ai, course, classId, examType, qpKey, qp
   return refAnswer;
 }
 
-// ─── Router ──────────────────────────────────────────────────────────────────
-
-const router = express.Router();
-const MODEL = "gemini-2.5-flash";
-
-// ✅ evalType stressed 3 times in prompt
-const buildEvalPrompt = (evalType) => `
-You are an expert academic evaluator.
-
-════════════════════════════════════════════════════════════════
-⚠️  EVALUATION TYPE — THIS IS YOUR PRIMARY INSTRUCTION:
-${evalType}
-
-You MUST strictly follow this evaluation type for EVERY question and EVERY mark decision.
-This overrides any default assumptions you may have about marking.
-Do NOT deviate from this evaluation type under any circumstance.
-════════════════════════════════════════════════════════════════
-
-INPUTS PROVIDED:
-1. Question Paper — use this to identify ALL questions and their exact max marks
-2. Marking Scheme (if provided) — use as secondary reference for awarding marks
-3. Official Textbook Content (if provided) — use as primary content reference
-4. Student Answer Sheet (File name = Student Roll Number)
-
-STEP 1 — READ THE QUESTION PAPER FIRST:
-* Identify every question number and its exact max marks as printed in the question paper.
-* Sum all question max marks to get the total maximum marks for this paper.
-* Output this on the very first line of your response as: MAX_MARKS: [number]
-* Do NOT guess or assume max marks — read them directly from the question paper.
-
-STEP 2 — EVALUATE EVERY QUESTION:
-* You MUST evaluate EVERY question in the question paper — do not skip any.
-* Students may have answered extra questions — evaluate ONLY the questions listed in the question paper.
-* For each question, apply the EVALUATION TYPE strictly while deciding marks.
-* Award full / partial / zero marks along with a concise justification per question.
-* If a question was not attempted by the student, award 0 with justification "Not attempted".
-
-════════════════════════════════════════════════════════════════
-⚠️  EVALUATION TYPE REMINDER — apply this to every single mark decision:
-${evalType}
-════════════════════════════════════════════════════════════════
-
-OUTPUT FORMAT — your entire response must follow this exact structure, nothing else:
-
-MAX_MARKS: [total maximum marks from the question paper]
-
-| Roll No | Q1 | Max Marks | Marks Awarded | Justification | Q2 | Max Marks | Marks Awarded | Justification | ... (repeat for ALL questions) | Total Marks |
-|---|---|---|---|---|---|---|---|---|---|
-| [rollNo] | [Q1 label] | [max] | [awarded] | [justification] | ... | [total awarded] |
-
-CRITICAL OUTPUT RULES:
-- Line 1 MUST be: MAX_MARKS: [number]
-- Line 2 MUST be blank
-- Line 3 onwards: the markdown table starting with | Roll No |
-- Output the table in ONE single complete response — do not stop mid-row
-- Every row must be complete from Roll No to Total Marks
-- Do NOT add any other text, preamble, explanation, or conclusion
-- Do NOT say "Here is the evaluation" or anything similar
-`.trim();
-
-/**
- * POST /api/evaluation/run
- * body: { classId, course, examType, evalType, force?, scriptKeys }
- */
-router.post("/run", async (req, res) => {
+// ─── Background Evaluation Logic ─────────────────────────────────────────────
+async function runEvaluationInBackground({
+  classId, course, examType, evalType, force, scriptKeys, BUCKET,
+}) {
   try {
-    const { classId, course, examType, evalType, force, scriptKeys } = req.body || {};
-
-    if (!classId || !course || !examType || !evalType) {
-      return res.status(400).json({ error: "classId, course, examType, evalType are required" });
-    }
-
-    const BUCKET = process.env.S3_BUCKET;
-    if (!BUCKET) return res.status(500).json({ error: "Missing S3_BUCKET in Backend .env" });
-    if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: "Missing GEMINI_API_KEY in Backend .env" });
-
     const basePrefix = `${course}/${classId}/${examType}`;
     const qpPrefix   = `${basePrefix}/question-paper/`;
     const msPrefix   = `${basePrefix}/marking-scheme/`;
@@ -283,33 +307,26 @@ router.post("/run", async (req, res) => {
       listPdfsS3(BUCKET, refPrefix),
     ]);
 
-    if (!scriptKeys || scriptKeys.length === 0) {
-      return res.status(400).json({ error: "No scripts provided for evaluation" });
-    }
-
     const scriptPdfs = scriptKeys
       .map((s) => (typeof s === "string" ? s : s.key))
       .filter(Boolean);
 
-    console.log("📥 Scripts received from frontend:", scriptPdfs);
+    console.log("📥 [BG] Scripts to evaluate:", scriptPdfs);
 
     if (!qpPdfs.length) {
-      return res.status(400).json({ error: `No Question Paper PDFs found at prefix: ${qpPrefix}` });
-    }
-    if (!scriptPdfs.length) {
-      return res.status(400).json({ error: "No valid script keys provided" });
+      console.error("❌ [BG] No Question Paper found at:", qpPrefix);
+      return;
     }
 
     const qpKey  = qpPdfs[0];
     const msKey  = msPdfs[0]  || null;
     const refKey = refPdfs[0] || null;
 
-    console.log("\n=== EVALUATION RUN ===");
+    console.log("\n=== [BG] EVALUATION RUN ===");
     console.log("classId:", classId, "| course:", course, "| examType:", examType);
     console.log("evalType:", evalType);
-    console.log("force:", !!force, "| bucket:", BUCKET);
     console.log("QP:", qpKey, "| MS:", msKey, "| REF:", refKey);
-    console.log("scripts found:", scriptPdfs.length);
+    console.log("scripts:", scriptPdfs.length);
 
     const [qpBytes, msBytes, refBytes] = await Promise.all([
       downloadFromS3(BUCKET, qpKey),
@@ -325,7 +342,7 @@ router.post("/run", async (req, res) => {
     let skippedExisting = 0;
     const failures      = [];
 
-    // ── Evaluation loop ──────────────────────────────────────────────────────
+    // ── Evaluation loop ───────────────────────────────────────────────────────
     for (const scriptKey of scriptPdfs) {
       processed++;
       const rollNo = rollNoFromKey(scriptKey);
@@ -333,12 +350,12 @@ router.post("/run", async (req, res) => {
       try {
         const exists = await MarkMatrix.findOne({ scriptKey }).lean();
         if (exists && !force) {
-          console.log("⏭ Skipping already evaluated:", scriptKey);
+          console.log("⏭ [BG] Skipping already evaluated:", scriptKey);
           skippedExisting++;
           continue;
         }
 
-        console.log(`\n---- Evaluating (${processed}/${scriptPdfs.length}): ${scriptKey} ----`);
+        console.log(`\n[BG] ---- Evaluating (${processed}/${scriptPdfs.length}): ${scriptKey} ----`);
 
         const scriptBytes = await downloadFromS3(BUCKET, scriptKey);
 
@@ -351,9 +368,9 @@ router.post("/run", async (req, res) => {
         const hasOcrText = ocrRecord?.ocrStatus === "done" && !!ocrRecord?.extractedText;
 
         if (hasOcrText) {
-          console.log(`  ✅ Using pre-extracted OCR text from Result collection (${ocrRecord.extractedText.length} chars)`);
+          console.log(`  ✅ [BG] Using OCR text (${ocrRecord.extractedText.length} chars)`);
         } else {
-          console.log(`  ℹ️  No OCR text found in Result — Gemini will read PDF directly`);
+          console.log(`  ℹ️  [BG] No OCR text — Gemini reads PDF directly`);
         }
 
         const contents = [
@@ -378,8 +395,6 @@ router.post("/run", async (req, res) => {
           });
         }
 
-        // ✅ if OCR text exists in Result → send as text (transparent + accurate)
-        // otherwise fall back to raw PDF → Gemini Vision
         if (hasOcrText) {
           contents.push({
             role: "user",
@@ -405,7 +420,6 @@ router.post("/run", async (req, res) => {
           finalText += text;
         }
 
-        // ✅ extract maxMarks from Gemini's MAX_MARKS: line
         const maxMarks = extractMaxMarks(finalText);
 
         const tableStart = finalText.indexOf("| Roll No");
@@ -413,12 +427,10 @@ router.post("/run", async (req, res) => {
         const resultTable = finalText.slice(tableStart).trim();
         if (!resultTable) throw new Error("Empty result from Gemini");
 
-        // ✅ extract totalMarks from last cell of last data row
         const totalMarks = extractTotal(resultTable);
 
-        console.log(`📊 rollNo=${rollNo} | totalMarks=${totalMarks} | maxMarks=${maxMarks}`);
+        console.log(`📊 [BG] rollNo=${rollNo} | totalMarks=${totalMarks} | maxMarks=${maxMarks}`);
 
-        // ✅ save evaluation result to MarkMatrix (existing collection — untouched)
         await MarkMatrix.updateOne(
           { scriptKey },
           {
@@ -435,10 +447,10 @@ router.post("/run", async (req, res) => {
         );
 
         if (exists) updatedExisting++; else newlySaved++;
-        console.log(`✅ Saved to MarkMatrix: rollNo=${rollNo} | totalMarks=${totalMarks} | maxMarks=${maxMarks}`);
+        console.log(`✅ [BG] Saved: rollNo=${rollNo} | totalMarks=${totalMarks} | maxMarks=${maxMarks}`);
 
       } catch (e) {
-        console.error("❌ Failed script:", scriptKey, e?.message || e);
+        console.error("❌ [BG] Failed script:", scriptKey, e?.message || e);
 
         await MarkMatrix.updateOne(
           { scriptKey },
@@ -459,44 +471,70 @@ router.post("/run", async (req, res) => {
       }
     }
 
-    // ── Generate reference answers after evaluation ───────────────────────────
-    let referenceAnswer      = null;
-    let referenceAnswerError = null;
+    console.log(`\n✅ [BG] Evaluation complete — processed:${processed} saved:${newlySaved} updated:${updatedExisting} skipped:${skippedExisting} failed:${failures.length}`);
 
+    // ── Generate reference answers after evaluation ───────────────────────────
     try {
-      console.log("\n=== GENERATING REFERENCE ANSWERS ===");
-      referenceAnswer = await generateReferenceAnswers(
+      console.log("\n=== [BG] GENERATING REFERENCE ANSWERS ===");
+      const referenceAnswer = await generateReferenceAnswers(
         ai, course, classId, examType, qpKey, qpBytes, msKey, msBytes
       );
-      console.log("✅ Reference answers saved:", referenceAnswer?.pdfLink);
+      console.log("✅ [BG] Reference answers saved:", referenceAnswer?.pdfLink);
     } catch (refErr) {
-      referenceAnswerError = refErr?.message || String(refErr);
-      console.error("❌ Reference answer generation failed:", referenceAnswerError);
+      console.error("❌ [BG] Reference answer generation failed:", refErr?.message || refErr);
     }
 
-    return res.json({
+  } catch (err) {
+    console.error("❌ [BG] runEvaluationInBackground crashed:", err?.message || err);
+  }
+}
+
+// ─── Router ──────────────────────────────────────────────────────────────────
+const router = express.Router();
+const MODEL  = "gemini-2.5-flash";
+
+/**
+ * POST /api/evaluation/run
+ * ✅ Responds immediately — runs evaluation in background to avoid Render timeout
+ * body: { classId, course, examType, evalType, force?, scriptKeys }
+ */
+router.post("/run", async (req, res) => {
+  try {
+    const { classId, course, examType, evalType, force, scriptKeys } = req.body || {};
+
+    if (!classId || !course || !examType || !evalType) {
+      return res.status(400).json({ error: "classId, course, examType, evalType are required" });
+    }
+
+    const BUCKET = process.env.S3_BUCKET;
+    if (!BUCKET)                    return res.status(500).json({ error: "Missing S3_BUCKET in .env" });
+    if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: "Missing GEMINI_API_KEY in .env" });
+
+    if (!scriptKeys || scriptKeys.length === 0) {
+      return res.status(400).json({ error: "No scripts provided for evaluation" });
+    }
+
+    console.log(`\n🚀 [EVAL] Received ${scriptKeys.length} script(s) — starting background evaluation`);
+
+    // ✅ Respond immediately so frontend doesn't hit timeout / CORS error
+    res.json({
       ok: true,
-      message: "Evaluation finished",
-      classId, course, examType,
-      bucket: BUCKET,
-      force: !!force,
-      used: { questionPaper: qpKey, markingScheme: msKey, referenceText: refKey },
-      totalScriptsFound: scriptPdfs.length,
-      processed, newlySaved, updatedExisting, skippedExisting,
-      failuresCount: failures.length,
-      failures,
-      referenceAnswer: referenceAnswer
-        ? { pdfLink: referenceAnswer.pdfLink, status: referenceAnswer.status }
-        : null,
-      referenceAnswerError,
+      message: "Evaluation started — processing in background ✅",
+      scriptCount: scriptKeys.length,
+      classId,
+      course,
+      examType,
     });
+
+    // ✅ Fire and forget — runs after response is sent
+    runEvaluationInBackground({ classId, course, examType, evalType, force, scriptKeys, BUCKET })
+      .catch((err) => console.error("❌ [EVAL] Unhandled background error:", err?.message || err));
 
   } catch (err) {
     console.error("Evaluation route error:", err);
-    return res.status(500).json({
-      ok: false,
-      error: err?.message || "Evaluation failed. Check backend console.",
-    });
+    if (!res.headersSent) {
+      return res.status(500).json({ ok: false, error: err?.message || "Evaluation failed" });
+    }
   }
 });
 
