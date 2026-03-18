@@ -165,7 +165,7 @@ async function generateReferenceAnswers(ai, course, classId, examType, qpKey, qp
     contents,
   });
 
-  let  = "";
+  let  finalText= "";
   for await (const chunk of stream) {
     const text =
       chunk?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
